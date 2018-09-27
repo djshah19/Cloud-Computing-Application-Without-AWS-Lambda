@@ -7,11 +7,14 @@ Instructions:
 2. Install MariaDB
 3. Clone assignment2 branch in local
 4. Open project in intelliJ
-5. Configure database connections in code.
+5. Configure database connections in code
 6. Build the project
 7. Run WebapiAssignment2Application.java
 8. Use POSTMAN to consume the API's
  
-Programming language - Java,
-Frameworks - Spring 
+ 
+Programming language - Java
+
+Frameworks - Spring
+
 Third-party libraries - Spring boot, Spring boot security, SQL connectors, Bcrypt
