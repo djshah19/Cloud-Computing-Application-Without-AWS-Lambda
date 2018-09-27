@@ -25,11 +25,16 @@ public class AuthController {
     public String register(HttpServletRequest req){
         String username = req.getParameter("username");
         String password = req.getParameter("password");
-        BasicDAO basicDAO = new BasicDAO();
-        String salt = BCrypt.gensalt();
-        password = BCrypt.hashpw(password, salt);
-        if(basicDAO.register(username,password) == 2){
-            return "{message:'User successfully registered'}";
+        if(username != null && password != null && username.length() > 0 && password.length() > 0) {
+            BasicDAO basicDAO = new BasicDAO();
+            String salt = BCrypt.gensalt();
+            password = BCrypt.hashpw(password, salt);
+            if (basicDAO.register(username, password) == 2) {
+                return "{message:'User successfully registered'}";
+            }
+        }
+        else{
+            return "Username or password cannot be blank";
         }
         return "{message:'User already exist'}";
     }
@@ -37,18 +42,22 @@ public class AuthController {
     @RequestMapping(value="/time",method = RequestMethod.GET)
     public String time(HttpServletRequest req){
         String headers = req.getHeader(HttpHeaders.AUTHORIZATION);
-        BasicDAO basicDAO = new BasicDAO();
-        String base64Credentials = headers.substring("Basic".length()).trim();
-        byte[] credDecoded = Base64.getDecoder().decode(base64Credentials);
-        String credentials = new String(credDecoded, StandardCharsets.UTF_8);
-        // credentials = username:password
-        final String[] values = credentials.split(":", 2);
+        if(headers != null) {
+            BasicDAO basicDAO = new BasicDAO();
+            String base64Credentials = headers.substring("Basic".length()).trim();
+            byte[] credDecoded = Base64.getDecoder().decode(base64Credentials);
+            String credentials = new String(credDecoded, StandardCharsets.UTF_8);
+            // credentials = username:password
+            final String[] values = credentials.split(":", 2);
 
-        if(basicDAO.verifyUser(values[0],values[1])){
-            return "{timestamp:'"+new Timestamp(System.currentTimeMillis()).toString()+"'}";
+            if (basicDAO.verifyUser(values[0], values[1])) {
+                return "{timestamp:'" + new Timestamp(System.currentTimeMillis()).toString() + "'}";
+            } else {
+                return "{message:'Username or password is incorrect'}";
+            }
         }
         else{
-            return "{message:'Username or password is incorrect'}";
+            return "{message:'Authorization header is required'}";
         }
     }
 }
