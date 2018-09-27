@@ -1,7 +1,5 @@
 # csye6225-fall2018-repo-template
 
-instructions on how to build, test and deploy their application including any pre-requisites for 
-
 Instructions:
 1. Install IntelliJ IDE, JDK 1.8
 2. Install MariaDB
