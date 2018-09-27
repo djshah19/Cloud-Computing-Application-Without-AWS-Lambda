@@ -1,10 +1,70 @@
 {
-   "AWSTemplateFormatVersion" : "2010-09-09",
+   "AWSTemplateFormatVersion" : "2018-09-27",
+
+   "Parameters" : {
+
+      "AvailabilityZone1" : {
+         "Type" : "String",
+         "Default" : "us-east-1a"
+      },
+      
+      "AvailabilityZone2" : {
+         "Type" : "String",
+         "Default" : "us-east-1b"
+      },
+
+      "AvailabilityZone3" : {
+         "Type" : "String",
+         "Default" : "us-east-1c"
+      },
+
+      "VPCCidrBlock" : {
+         "Type" : "String",
+         "Default" : "10.0.0.0/16"
+      },
+
+      "VPCPuSubnetCidrBlock1" : {
+         "Type" : "String",
+         "Default" : "10.0.0.0/24"
+      },
+
+      "VPCPuSubnetCidrBlock2" : {
+         "Type" : "String",
+         "Default" : "10.0.1.0/24"
+      },
+
+      "VPCPuSubnetCidrBlock3" : {
+         "Type" : "String",
+         "Default" : "10.0.2.0/24"
+      },
+
+      "VPCPrSubnetCidrBlock1" : {
+         "Type" : "String",
+         "Default" : "10.0.10.0/24"
+      },
+
+      "VPCPrSubnetCidrBlock2" : {
+         "Type" : "String",
+         "Default" : "10.0.11.0/24"
+      },
+
+      "VPCPrSubnetCidrBlock3" : {
+         "Type" : "String",
+         "Default" : "10.0.12.0/24"
+      },
+
+      "DestinationCidrBlock" : {
+         "Type" : "String",
+         "Default" : "0.0.0.0/24"
+      }
+
+   },
+
    "Resources" : {
       "myVPC" : {
          "Type" : "AWS::EC2::VPC",
          "Properties" : {
-          "CidrBlock" : "10.0.0.0/16",
+          "CidrBlock" : { "Ref" : "VPCCidrBlock" },
     	    "EnableDnsSupport" : "false",
     	    "EnableDnsHostnames" : "false",
             "InstanceTenancy" : "dedicated",
@@ -16,8 +76,8 @@
          "Type" : "AWS::EC2::Subnet",
          "Properties" : {
             "VpcId" : { "Ref" : "myVPC" },
-            "CidrBlock" : "10.0.0.0/24",
-            "AvailabilityZone" : "us-east-1a",
+            "CidrBlock" : { "Ref" : "VPCPuSubnetCidrBlock1" },
+            "AvailabilityZone" : { "Ref" : "AvailabilityZone1" },
             "Tags" : [ { "Key" : "foo", "Value" : "bar" } ]
          }
       },
@@ -26,8 +86,8 @@
          "Type" : "AWS::EC2::Subnet",
          "Properties" : {
             "VpcId" : { "Ref" : "myVPC" },
-            "CidrBlock" : "10.0.1.0/24",
-            "AvailabilityZone" : "us-east-1b",
+            "CidrBlock" : { "Ref" : "VPCPuSubnetCidrBlock2" },
+            "AvailabilityZone" : { "Ref" : "AvailabilityZone2" },
             "Tags" : [ { "Key" : "foo", "Value" : "bar" } ]
          }
       },
@@ -36,8 +96,8 @@
          "Type" : "AWS::EC2::Subnet",
          "Properties" : {
             "VpcId" : { "Ref" : "myVPC" },
-            "CidrBlock" : "10.0.2.0/24",
-            "AvailabilityZone" : "us-east-1c",
+            "CidrBlock" : { "Ref" : "VPCPuSubnetCidrBlock3" },
+            "AvailabilityZone" : { "Ref" : "AvailabilityZone3" },
             "Tags" : [ { "Key" : "foo", "Value" : "bar" } ]
          }
       },
@@ -46,8 +106,8 @@
          "Type" : "AWS::EC2::Subnet",
          "Properties" : {
             "VpcId" : { "Ref" : "myVPC" },
-            "CidrBlock" : "10.0.10.0/24",
-            "AvailabilityZone" : "us-east-1a",
+            "CidrBlock" : { "Ref" : "VPCPrSubnetCidrBlock1" },
+            "AvailabilityZone" : { "Ref" : "AvailabilityZone1" },
             "Tags" : [ { "Key" : "foo", "Value" : "bar" } ]
          }
       },
@@ -56,8 +116,8 @@
          "Type" : "AWS::EC2::Subnet",
          "Properties" : {
             "VpcId" : { "Ref" : "myVPC" },
-            "CidrBlock" : "10.0.11.0/24",
-            "AvailabilityZone" : "us-east-1b",
+            "CidrBlock" : { "Ref" : "VPCPrSubnetCidrBlock2" },
+            "AvailabilityZone" : { "Ref" : "AvailabilityZone2" },
             "Tags" : [ { "Key" : "foo", "Value" : "bar" } ]
          }
       },
@@ -66,8 +126,8 @@
          "Type" : "AWS::EC2::Subnet",
          "Properties" : {
             "VpcId" : { "Ref" : "myVPC" },
-            "CidrBlock" : "10.0.12.0/24",
-            "AvailabilityZone" : "us-east-1c",
+            "CidrBlock" : { "Ref" : "VPCPrSubnetCidrBlock3" },
+            "AvailabilityZone" : { "Ref" : "AvailabilityZone3" },
             "Tags" : [ { "Key" : "foo", "Value" : "bar" } ]
          }
       },
@@ -149,7 +209,7 @@
          "DependsOn" : "AttachGateway",
          "Properties" : {
             "RouteTableId" : { "Ref" : "PublicRouteTable" },
-            "DestinationCidrBlock" : "0.0.0.0/0",
+            "DestinationCidrBlock" : { "Ref" : "DestinationCidrBlock" },
             "GatewayId" : { "Ref" : "myInternetGateway" }
          }
       }
