@@ -1,4 +1,14 @@
 package com.me.web.dao;
 
-public class TransactionDao {
+import com.me.web.pojo.Transaction;
+
+public class TransactionDao extends DAO{
+
+    public Transaction insertTransaction(Transaction transaction){
+        org.hibernate.Transaction tx = session.beginTransaction();
+        session.save(transaction);
+        tx.commit();
+        session.close();
+        return null;
+    }
 }

@@ -4,7 +4,7 @@ package com.me.web.pojo;
 import javax.persistence.*;
 
 @Entity
-@Table(name="Transaction")
+@Table(name="transaction")
 public class Transaction {
 
     @Id
@@ -26,6 +26,9 @@ public class Transaction {
 
     @Column(name="category")
     private String category;
+
+    @ManyToOne
+    private User user;
 
 
     public int getId() {

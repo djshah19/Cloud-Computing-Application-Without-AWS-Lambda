@@ -1,6 +1,7 @@
 package com.me.web.pojo;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name="user_table")
@@ -17,8 +18,8 @@ public class User {
     @Column(name="password")
     private String password;
 
-    @OneToMany
-    private Transaction transaction;
+    @OneToMany()
+    private List<Transaction> transactions;
 
     public User(){
 
@@ -48,11 +49,4 @@ public class User {
         this.password = password;
     }
 
-    public Transaction getTransaction() {
-        return transaction;
-    }
-
-    public void setTransaction(Transaction transaction) {
-        this.transaction = transaction;
-    }
 }
