@@ -30,6 +30,17 @@ public class Transaction {
     @ManyToOne
     private User user;
 
+    public Transaction(){
+
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 
     public int getId() {
         return id;

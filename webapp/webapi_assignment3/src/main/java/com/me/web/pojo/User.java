@@ -18,9 +18,6 @@ public class User {
     @Column(name="password")
     private String password;
 
-    @OneToMany()
-    private List<Transaction> transactions;
-
     public User(){
 
     }
