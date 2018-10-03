@@ -6,17 +6,20 @@ import com.me.web.pojo.Transaction;
 import com.me.web.pojo.User;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-
+@RestController
 public class TransactionController {
 
-    @RequestMapping("/transaction/save")
+    @RequestMapping(value = "/transaction/save", method = RequestMethod.POST)
     public String saveTransaction(HttpServletRequest req, TransactionDao txDao, UserDao userDao) throws  Exception{
         String headers = req.getHeader(HttpHeaders.AUTHORIZATION);
         User user = null;
@@ -52,7 +55,7 @@ public class TransactionController {
     }
 
 
-    @RequestMapping("/transaction/delete")
+    @RequestMapping(value="/transaction/delete", method = RequestMethod.DELETE)
     public String deleteTransaction(HttpServletRequest req, TransactionDao txDao, UserDao userDao) throws  Exception{
         String headers = req.getHeader(HttpHeaders.AUTHORIZATION);
         User user = null;
@@ -78,7 +81,7 @@ public class TransactionController {
         return "{message:'Authorization header is required'}";
     }
 
-    @RequestMapping("/transaction/update")
+    @RequestMapping(value="/transaction/update", method = RequestMethod.PUT)
     public String updateTransaction(HttpServletRequest req, TransactionDao txDao, UserDao userDao) throws  Exception{
         String headers = req.getHeader(HttpHeaders.AUTHORIZATION);
         User user = null;
@@ -121,7 +124,7 @@ public class TransactionController {
         return "{message:'Authorization header is required'}";
     }
 
-    @RequestMapping("/transaction/getAll")
+    @RequestMapping(value="/transaction/getAll", method = RequestMethod.GET)
     public String getAllTransaction(HttpServletRequest req, TransactionDao txDao, UserDao userDao) throws  Exception{
         String headers = req.getHeader(HttpHeaders.AUTHORIZATION);
         User user = null;

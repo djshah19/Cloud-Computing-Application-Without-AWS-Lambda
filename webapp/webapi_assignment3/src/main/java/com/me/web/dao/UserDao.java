@@ -22,9 +22,10 @@ public class UserDao extends DAO{
     public User verifyUser(String userName, String password) throws Exception {
        try{
            begin();
-           Query q = getSession().createQuery("from user_table where username = :username");
+           Query q = getSession().createQuery("from User where username = :username ");
            q.setString("username", userName);
            User user = (User)q.uniqueResult();
+           commit();
            if(!user.getUsername().isEmpty()&& BCrypt.checkpw(password, user.getPassword())) {
                return user;
            }

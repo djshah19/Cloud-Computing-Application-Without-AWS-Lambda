@@ -4,6 +4,7 @@ import com.me.web.pojo.Transaction;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 
+import javax.transaction.TransactionManager;
 import java.util.List;
 
 public class TransactionDao extends DAO{
@@ -23,8 +24,16 @@ public class TransactionDao extends DAO{
 
     public Transaction getTransactionById(int id) throws Exception{
         try {
-            begin();
+            char flag = ' ';
+            if(!getSession().getTransaction().isActive())
+            {
+                begin();
+            flag = 'X';
+            }
             Transaction transaction = (Transaction)getSession().get(Transaction.class, id);
+           if(flag=='X'){
+            commit();
+           }
             if(transaction!=null){
                 return transaction;
             }else{
@@ -70,9 +79,10 @@ public class TransactionDao extends DAO{
     public List<Transaction> getAllTransaction(int id)throws Exception{
         try{
             begin();
-            Query q = getSession().createQuery("from transaction where user_id = :id");
+            Query q = getSession().createQuery("from Transaction where user_id = :id");
             q.setInteger("id", id);
             List<Transaction> list = q.getResultList();
+            commit();
             return list;
 
         }catch (HibernateException e){
