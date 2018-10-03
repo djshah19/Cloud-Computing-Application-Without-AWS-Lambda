@@ -13,9 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
+import java.util.*;
+
 @RestController
 public class TransactionController {
 
@@ -125,8 +124,9 @@ public class TransactionController {
     }
 
     @RequestMapping(value="/transaction/getAll", method = RequestMethod.GET)
-    public String getAllTransaction(HttpServletRequest req, TransactionDao txDao, UserDao userDao) throws  Exception{
+    public HashMap<String, Object> getAllTransaction(HttpServletRequest req, TransactionDao txDao, UserDao userDao) throws  Exception{
         String headers = req.getHeader(HttpHeaders.AUTHORIZATION);
+        HashMap<String, Object> map = new HashMap<>();
         User user = null;
         if(headers != null) {
             String base64Credentials = headers.substring("Basic".length()).trim();
@@ -135,16 +135,22 @@ public class TransactionController {
             final String[] values = credentials.split(":", 2);
             user = userDao.verifyUser(values[0], values[1]);
             if (user.getUsername().isEmpty()) {
-                return "{message:'Username or password is incorrect'}";
+                map.put("Message", "message:'Username or password is incorrect'");
+                //return "{message:'Username or password is incorrect'}";
+                return map;
             }else{
                 List<Transaction> list = txDao.getAllTransaction(user.getId());
-
                 if(list.isEmpty()){
-                    return "{message:'No transaction found'}";
+                    map.put("Message", "message:'No transaction found'");
+                    //return "{message:'No transaction found'}";
+                    return map;
                 }else{
-                    return null;
+                    map.put("Transaction", list);
+                    return map;
                 }
             }
         }
-        return "{message:'Authorization header is required'}";
+        map.put("Message", "message:'Authorization header is required'");
+        //return "{message:'Authorization header is required'}";
+        return map;
 }}

@@ -27,7 +27,7 @@ public class Transaction {
     @Column(name="category")
     private String category;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
     public Transaction(){
