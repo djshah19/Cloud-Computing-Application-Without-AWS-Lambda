@@ -19,12 +19,12 @@
         "Subnet": {
             "Type": "AWS::EC2::Subnet::Id",
             "Description": "Subnet to launch the instance into.",
-            "Default" : "subnet-0bea66866fbd847b7"
+            "Default" : "subnet-061c2c38fffcf9a25"
         },
         "VPC": {
             "Type": "AWS::EC2::VPC::Id",
             "Description": "VPC to launch the instance into.",
-            "Default" : "vpc-0d1a8e3d5506a67f2"
+            "Default" : "vpc-0795fb4435f56923b"
         },
         "SSHLocation" : {
             "Description" : "The IP address range that can be used to SSH to the EC2 instances",

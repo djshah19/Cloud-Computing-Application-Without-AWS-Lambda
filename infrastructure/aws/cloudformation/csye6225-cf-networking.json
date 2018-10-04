@@ -67,7 +67,7 @@
           "CidrBlock" : { "Ref" : "VPCCidrBlock" },
     	    "EnableDnsSupport" : "false",
     	    "EnableDnsHostnames" : "false",
-            "InstanceTenancy" : "dedicated",
+            "InstanceTenancy" : "default",
             "Tags" : [ {"Key" : "foo", "Value" : "bar"} ]
          }
       },

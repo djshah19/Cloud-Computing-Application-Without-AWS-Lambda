@@ -13,8 +13,8 @@ public class BasicDAO {
         java.sql.PreparedStatement stmt = null;
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/assignment2", "ivan", "ivan");
-            String query = "INSERT INTO assignment2.users(username,password) VALUES (?,?);";
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/assignment2", "suyog", "suyog");
+            String query = "INSERT INTO assignment2.myTable(username,password) VALUES (?,?);";
 
             stmt = connection.prepareStatement(query);
             stmt.setString(1, user);
@@ -43,8 +43,8 @@ public class BasicDAO {
         java.sql.PreparedStatement stmt = null;
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/assignment2", "ivan", "ivan");
-            String query = "SELECT username from assignment2.users where username like ?;";
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/assignment2", "suyog", "suyog");
+            String query = "SELECT username from assignment2.myTable where username like ?;";
 
             stmt = connection.prepareStatement(query);
             stmt.setString(1, user);
@@ -76,8 +76,8 @@ public class BasicDAO {
         java.sql.PreparedStatement stmt = null;
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/assignment2", "ivan", "ivan");
-            String query = "SELECT username,password from assignment2.users where username like ?";
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/assignment2", "suyog", "suyog");
+            String query = "SELECT username,password from assignment2.myTable where username like ?";
 
             stmt = connection.prepareStatement(query);
             stmt.setString(1, user);
