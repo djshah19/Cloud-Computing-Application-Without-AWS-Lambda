@@ -20,7 +20,7 @@ public class WebapiAssignment2ApplicationTests {
     public void register(){
         BasicDAO ba = new BasicDAO();
 
-        int val = ba.register("ivan","ivan");
+        int val = ba.register("suyog","suyog");
         assertEquals(1, val);
     }
 }

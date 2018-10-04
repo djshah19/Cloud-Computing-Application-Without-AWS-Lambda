@@ -1,5 +1,5 @@
 {
-   "AWSTemplateFormatVersion" : "2018-09-27",
+   "AWSTemplateFormatVersion" : "2010-09-09",
 
    "Parameters" : {
 
