@@ -27,7 +27,7 @@ public class Transaction {
     @Column(name="category")
     private String category;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(cascade = {}, fetch = FetchType.LAZY, optional = false)
     private User user;
 
     public Transaction(){
