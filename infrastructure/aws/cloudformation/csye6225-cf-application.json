@@ -5,26 +5,26 @@
         "KeyName":{
             "Description": "Name of an existing EC2 KeyPair to enable SSH access to the instance",
             "Type": "AWS::EC2::KeyPair::KeyName",
-            "ConstraintDescription": "must be the name of an existing EC2 pair",
-            "Default" : "~/Cloud_Docs/webApp.pem"
+            "ConstraintDescription": "must be the name of an existing EC2 pair",	    
+            "Default":"KeyName"
         },
         "InstanceType":{
             "Description" : "EC2 instance type",
             "Type" : "String",
             "Default" : "t2.micro",
             "AllowedValues" : [ "t2.micro"],
-            "ConstraintDescription" : "Must be a valid EC2 instance type",
+            "ConstraintDescription" : "Must be a valid EC2 instance type"
             
         },
         "Subnet": {
             "Type": "AWS::EC2::Subnet::Id",
             "Description": "Subnet to launch the instance into.",
-            "Default" : "subnet-003c1eaf65b2ff944"
+            "Default" : "subnet-0bea66866fbd847b7"
         },
         "VPC": {
             "Type": "AWS::EC2::VPC::Id",
             "Description": "VPC to launch the instance into.",
-            "Default" : "us-east-1"
+            "Default" : "vpc-0d1a8e3d5506a67f2"
         },
         "SSHLocation" : {
             "Description" : "The IP address range that can be used to SSH to the EC2 instances",
@@ -33,18 +33,16 @@
             "MaxLength": "18",
             "Default": "0.0.0.0/0",
             "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
-            "ConstraintDescription": "Must be a valid IP CIDR range of the form x.x.x.x/x",
+            "ConstraintDescription": "Must be a valid IP CIDR range of the form x.x.x.x/x"
            
         }
         
     },
     
     "Mappings" : {
-        "AWSInstanceType2Arch" : {
-            "t2.micro"    : { "Arch" : "HVM64"  },        
-        },
+        
         "AWSRegionArch2AMI" : {
-            "us-east-1"      : { "HVM64" : "ami-9887c6e7"},        
+            "us-east-1"      : { "HVM64" : "ami-9887c6e7"}        
         }          
     },
 
@@ -52,8 +50,7 @@
         "WebServerInstance": {
             "Type": "AWS::EC2::Instance",
             "Properties": {
-                "ImageId" : { "Fn::FindInMap" : [ "AWSRegionArch2AMI", { "Ref" : "AWS::Region" },
-                            { "Fn::FindInMap" : [ "AWSInstanceType2Arch", { "Ref" : "InstanceType" }, "Arch" ] } ] },
+                "ImageId" : { "Fn::FindInMap" : [ "AWSRegionArch2AMI", { "Ref" : "AWS::Region" }, "HVM64"] },
                 "InstanceType"   : { "Ref" : "InstanceType" },
                 "SecurityGroupIds" : [ {"Ref" : "InstanceSecurityGroup"} ],
                 "SubnetId": {"Ref": "Subnet"},
@@ -79,8 +76,8 @@
             "Properties" : {
                 "GroupName" : "csye6225-webapp",
                 "GroupDescription" : "csye6225 webapp security",
-                "Tags" :  "csye6225-webapp",
-                "VpcId" : {"Ref" : "myVPC"},    
+               
+                "VpcId" : {"Ref" : "VPC"},    
                 "SecurityGroupIngress" : [{
                     "IpProtocol" : "tcp", 
                     "FromPort": 22,
@@ -92,13 +89,13 @@
                     "FromPort": 80,
                     "ToPort" : 80,                    
                     "CidrIp" : "0.0.0.0/0"
-                }
+                },
                 {
                     "IpProtocol" : "tcp",
                     "FromPort": 443,
                     "ToPort" : 443,
                     "CidrIp" : "0.0.0.0/0"
-                }],
+                }]
                 
             }
         }, 
@@ -107,15 +104,15 @@
             "Properties" : {
                 "GroupName" : "csye6225-rds",
                 "GroupDescription" : "csye6225 RDS DB security",
-                "Tags" :  "csye6225-rds",
-                "VpcId" : {"Ref" : "myVPC"},    
+               
+                "VpcId" : {"Ref" : "VPC"},    
                 "SecurityGroupIngress" : [{
                     "IpProtocol" : "tcp", 
                     "FromPort": 3306,
                     "ToPort" : 3306,
                     "CidrIp" : "0.0.0.0/0"
                 }
-                ],
+                ]
                 
             }
         }         
