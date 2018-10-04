@@ -1,5 +1,5 @@
 {
-   "AWSTemplateFormatVersion" : "2018-09-27",
+   "AWSTemplateFormatVersion" : "2010-09-09",
 
    "Parameters" : {
 
@@ -67,7 +67,7 @@
           "CidrBlock" : { "Ref" : "VPCCidrBlock" },
     	    "EnableDnsSupport" : "false",
     	    "EnableDnsHostnames" : "false",
-            "InstanceTenancy" : "dedicated",
+            "InstanceTenancy" : "default",
             "Tags" : [ {"Key" : "foo", "Value" : "bar"} ]
          }
       },
@@ -191,7 +191,7 @@
            "mySubnetRouteTableAssociation" : {
          "Type" : "AWS::EC2::SubnetRouteTableAssociation",
          "Properties" : {
-            "SubnetId" : { "Ref" : "PrivateSubnet1" },
+            "SubnetId" : { "Ref" : "PrivateSubnet2" },
             "RouteTableId" : { "Ref" : "PublicRouteTable" }
          }
       },
@@ -199,7 +199,7 @@
            "mySubnetRouteTableAssociation" : {
          "Type" : "AWS::EC2::SubnetRouteTableAssociation",
          "Properties" : {
-            "SubnetId" : { "Ref" : "PrivateSubnet1" },
+            "SubnetId" : { "Ref" : "PrivateSubnet3" },
             "RouteTableId" : { "Ref" : "PublicRouteTable" }
          }
       },
