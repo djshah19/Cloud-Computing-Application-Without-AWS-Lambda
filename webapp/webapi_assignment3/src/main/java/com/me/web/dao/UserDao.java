@@ -26,7 +26,7 @@ public class UserDao extends DAO{
            q.setString("username", userName);
            User user = (User)q.uniqueResult();
            commit();
-           if(!user.getUsername().isEmpty()&& BCrypt.checkpw(password, user.getPassword())) {
+           if(user != null && !user.getUsername().isEmpty()&& BCrypt.checkpw(password, user.getPassword())) {
                return user;
            }
            return null;

@@ -5,10 +5,7 @@ import com.me.web.dao.UserDao;
 import com.me.web.pojo.Transaction;
 import com.me.web.pojo.User;
 import org.springframework.http.HttpHeaders;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
@@ -18,18 +15,21 @@ import java.util.*;
 @RestController
 public class TransactionController {
 
-    @RequestMapping(value = "/transaction/save", method = RequestMethod.POST)
-    public String saveTransaction(HttpServletRequest req, TransactionDao txDao, UserDao userDao) throws  Exception{
+    @RequestMapping(value = "transaction", method = RequestMethod.POST)
+    public HashMap<String, Object> saveTransaction(HttpServletRequest req, TransactionDao txDao, UserDao userDao) throws  Exception{
         String headers = req.getHeader(HttpHeaders.AUTHORIZATION);
         User user = null;
+        HashMap<String, Object> map = new HashMap<>();
         if(headers != null) {
             String base64Credentials = headers.substring("Basic".length()).trim();
             byte[] credDecoded = Base64.getDecoder().decode(base64Credentials);
             String credentials = new String(credDecoded, StandardCharsets.UTF_8);
             final String[] values = credentials.split(":", 2);
             user = userDao.verifyUser(values[0], values[1]);
-            if (user.getUsername().isEmpty()) {
-                return "{message:'Username or password is incorrect'}";
+            if (user == null || user.getUsername().isEmpty()) {
+                map.put("Code",401);
+                map.put("Description","Unauthorized");
+                return map;
             }else{
                 String description = req.getParameter("description");
                 String merchant = req.getParameter("merchant");
@@ -44,65 +44,85 @@ public class TransactionController {
                     tx.setCategory(category);
                     tx.setUser(user);
                     if(txDao.insertTransaction(tx)==2){
-                        return "{message:'Transaction saved successfully'}";
+                        map.put("Description",tx);
+                        map.put("Code",200);
+                        return map;
                     }
             }
         }
-
-            return "{message:'Authorization header is required'}";
+        map.put("Code",401);map.put("Description","Unauthorized");
+        return map;
 
     }
 
 
-    @RequestMapping(value="/transaction/delete", method = RequestMethod.DELETE)
-    public String deleteTransaction(HttpServletRequest req, TransactionDao txDao, UserDao userDao) throws  Exception{
+    @RequestMapping(value="transaction/{id}", method = RequestMethod.DELETE)
+    public HashMap<String, Object> deleteTransaction(@PathVariable("id") int id, HttpServletRequest req, TransactionDao txDao, UserDao userDao) throws  Exception{
         String headers = req.getHeader(HttpHeaders.AUTHORIZATION);
         User user = null;
+        HashMap<String, Object> map = new HashMap<>();
         if(headers != null) {
             String base64Credentials = headers.substring("Basic".length()).trim();
             byte[] credDecoded = Base64.getDecoder().decode(base64Credentials);
             String credentials = new String(credDecoded, StandardCharsets.UTF_8);
             final String[] values = credentials.split(":", 2);
             user = userDao.verifyUser(values[0], values[1]);
-            if (user.getUsername().isEmpty()) {
-                return "{message:'Username or password is incorrect'}";
+            if (user == null || user.getUsername().isEmpty()) {
+                map.put("Code",401);
+                map.put("Description","Unauthorized");
+                return map;
             }else{
-                int txId = Integer.parseInt(req.getParameter("transactionid"));
-
-                if(txDao.deleteTransaction(txId)==2){
-                    return "{message:'Transaction deleted successfully'}";
+                int txId = id;
+                if(txId != 0){
+                    if(txDao.deleteTransaction(txId)==2){
+                        map.put("Code",200);
+                        map.put("Description","Successfully Deleted");
+                        return map;
+                    }else{
+                        map.put("Code",400);
+                        map.put("Description","Bad Request");
+                        return map;
+                    }
                 }else{
-                    return "{message:'Transaction not found'}";
+                    map.put("Code",204);
+                    map.put("Description","No Content");
+                    return map;
                 }
             }
         }
-
-        return "{message:'Authorization header is required'}";
+        map.put("Code",401);
+        map.put("Description","Unauthorized");
+        return map;
     }
 
-    @RequestMapping(value="/transaction/update", method = RequestMethod.PUT)
-    public String updateTransaction(HttpServletRequest req, TransactionDao txDao, UserDao userDao) throws  Exception{
+    @RequestMapping(value="transaction/{id}", method = RequestMethod.PUT)
+    public HashMap<String, Object> updateTransaction(@PathVariable("id") int id, HttpServletRequest req, TransactionDao txDao, UserDao userDao) throws  Exception{
         String headers = req.getHeader(HttpHeaders.AUTHORIZATION);
         User user = null;
+        HashMap<String, Object> map = new HashMap<>();
         if(headers != null) {
             String base64Credentials = headers.substring("Basic".length()).trim();
             byte[] credDecoded = Base64.getDecoder().decode(base64Credentials);
             String credentials = new String(credDecoded, StandardCharsets.UTF_8);
             final String[] values = credentials.split(":", 2);
             user = userDao.verifyUser(values[0], values[1]);
-            if (user.getUsername().isEmpty()) {
-                return "{message:'Username or password is incorrect'}";
+            if (user == null || user.getUsername().isEmpty()) {
+                map.put("Code",401);
+                map.put("Description","Unauthorized");
+                return map;
             }else{
-                int txId = Integer.parseInt(req.getParameter("transactionid"));
+                int txId = id;
                 Transaction tx = txDao.getTransactionById(txId);
                 if(tx==null){
-                    return "{message:'Transaction id does not exits'}";
+                    map.put("Code",400);
+                    map.put("Description","Bad Request");
+                    return map;
                 }
-                String description = req.getParameter("description");
-                String merchant = req.getParameter("merchant");
-                String amount = req.getParameter("amount");
-                String date = req.getParameter("date");
-                String category = req.getParameter("category");
+                String description = req.getParameter("description") == null?tx.getDescription():req.getParameter("description");
+                String merchant = req.getParameter("merchant") == null?tx.getMerchant():req.getParameter("merchant");
+                String amount = req.getParameter("amount") == null?String.valueOf(tx.getAmount()):req.getParameter("amount");
+                String date = req.getParameter("date") == null?tx.getDate():req.getParameter("date");
+                String category = req.getParameter("category") == null?tx.getCategory():req.getParameter("category");
 
                 tx.setId(txId);
                 tx.setDescription(description);
@@ -113,17 +133,23 @@ public class TransactionController {
                 tx.setUser(user);
 
                 if(txDao.editTransaction(tx)==2){
-                    return "{message:'Transaction updated successfully'}";
+                    map.put("Code",201);
+                    map.put("Description","Created");
+                    map.put("Transaction",tx);
+                    return map;
                 }else{
-                    return "{message:'Transaction not updated'}";
+                    map.put("Code",400);
+                    map.put("Description","Bad Request");
+                    return map;
                 }
             }
         }
-
-        return "{message:'Authorization header is required'}";
+        map.put("Code",401);
+        map.put("Description","Unauthorized");
+        return map;
     }
 
-    @RequestMapping(value="/transaction/getAll", method = RequestMethod.GET)
+    @RequestMapping(value="transaction", method = RequestMethod.GET)
     public HashMap<String, Object> getAllTransaction(HttpServletRequest req, TransactionDao txDao, UserDao userDao) throws  Exception{
         String headers = req.getHeader(HttpHeaders.AUTHORIZATION);
         HashMap<String, Object> map = new HashMap<>();
@@ -134,23 +160,26 @@ public class TransactionController {
             String credentials = new String(credDecoded, StandardCharsets.UTF_8);
             final String[] values = credentials.split(":", 2);
             user = userDao.verifyUser(values[0], values[1]);
-            if (user.getUsername().isEmpty()) {
-                map.put("Message", "message:'Username or password is incorrect'");
-                //return "{message:'Username or password is incorrect'}";
+            if (user == null || user.getUsername().isEmpty()) {
+                map.put("Code",401);
+                map.put("Description", "Unauthorized");
                 return map;
             }else{
                 List<Transaction> list = txDao.getAllTransaction(user.getId());
                 if(list.isEmpty()){
-                    map.put("Message", "message:'No transaction found'");
+                    map.put("Code",200);
+                    map.put("Description", "No transaction found");
                     //return "{message:'No transaction found'}";
                     return map;
                 }else{
+                    map.put("Code",200);
+                    map.put("Description","OK");
                     map.put("Transaction", list);
                     return map;
                 }
             }
         }
-        map.put("Message", "message:'Authorization header is required'");
-        //return "{message:'Authorization header is required'}";
+        map.put("Code",401);
+        map.put("Description", "Unauthorized");
         return map;
 }}
