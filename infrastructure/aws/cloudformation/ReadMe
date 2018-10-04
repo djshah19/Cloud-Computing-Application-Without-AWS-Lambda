@@ -1,0 +1,7 @@
+1. csye6225-aws-cf-create-stack.sh is a bash script which creates the stack with network resources. Stack name is taken as the parameter. It uses csye6225-cf-networking.json to create resources.
+
+2. csye6225-aws-cf-terminate-stack.sh terminates the stack whose name is passed as a parameter.
+
+3. csye6225-aws-cf-create-application-stack creates the application stack using the resources provided by csye6225-cf-application.json and parameter.json. 
+
+4. csye6225-aws-cf-terminate-application-stack.sh terminates the application stack whose name is passed as the parameter.
