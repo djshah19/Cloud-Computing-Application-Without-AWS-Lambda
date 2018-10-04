@@ -191,7 +191,7 @@
            "mySubnetRouteTableAssociation" : {
          "Type" : "AWS::EC2::SubnetRouteTableAssociation",
          "Properties" : {
-            "SubnetId" : { "Ref" : "PrivateSubnet1" },
+            "SubnetId" : { "Ref" : "PrivateSubnet2" },
             "RouteTableId" : { "Ref" : "PublicRouteTable" }
          }
       },
@@ -199,7 +199,7 @@
            "mySubnetRouteTableAssociation" : {
          "Type" : "AWS::EC2::SubnetRouteTableAssociation",
          "Properties" : {
-            "SubnetId" : { "Ref" : "PrivateSubnet1" },
+            "SubnetId" : { "Ref" : "PrivateSubnet3" },
             "RouteTableId" : { "Ref" : "PublicRouteTable" }
          }
       },
