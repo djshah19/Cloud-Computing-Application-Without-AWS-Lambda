@@ -74,13 +74,20 @@ public class TransactionController {
             }else{
                 int txId = id;
                 if(txId != 0){
-                    if(txDao.deleteTransaction(txId)==2){
-                        map.put("Code",200);
-                        map.put("Description","Successfully Deleted");
-                        return map;
-                    }else{
-                        map.put("Code",400);
-                        map.put("Description","Bad Request");
+                    if(txDao.authorizeUser(txId,user) == 2) {
+                        if (txDao.deleteTransaction(txId) == 2) {
+                            map.put("Code", 200);
+                            map.put("Description", "Successfully Deleted");
+                            return map;
+                        } else {
+                            map.put("Code", 400);
+                            map.put("Description", "Bad Request");
+                            return map;
+                        }
+                    }
+                    else{
+                        map.put("Code", 401);
+                        map.put("Description", "Unauthorized");
                         return map;
                     }
                 }else{
@@ -112,34 +119,41 @@ public class TransactionController {
                 return map;
             }else{
                 int txId = id;
-                Transaction tx = txDao.getTransactionById(txId);
-                if(tx==null){
-                    map.put("Code",400);
-                    map.put("Description","Bad Request");
-                    return map;
+                if(txDao.authorizeUser(txId,user) == 2) {
+                    Transaction tx = txDao.getTransactionById(txId);
+                    if (tx == null) {
+                        map.put("Code", 400);
+                        map.put("Description", "Bad Request");
+                        return map;
+                    }
+                    String description = req.getParameter("description") == null ? tx.getDescription() : req.getParameter("description");
+                    String merchant = req.getParameter("merchant") == null ? tx.getMerchant() : req.getParameter("merchant");
+                    String amount = req.getParameter("amount") == null ? String.valueOf(tx.getAmount()) : req.getParameter("amount");
+                    String date = req.getParameter("date") == null ? tx.getDate() : req.getParameter("date");
+                    String category = req.getParameter("category") == null ? tx.getCategory() : req.getParameter("category");
+
+                    tx.setId(txId);
+                    tx.setDescription(description);
+                    tx.setMerchant(merchant);
+                    tx.setAmount(Double.parseDouble(amount));
+                    tx.setDate(date);
+                    tx.setCategory(category);
+                    tx.setUser(user);
+
+                    if (txDao.editTransaction(tx) == 2) {
+                        map.put("Code", 201);
+                        map.put("Description", "Created");
+                        map.put("Transaction", tx);
+                        return map;
+                    } else {
+                        map.put("Code", 400);
+                        map.put("Description", "Bad Request");
+                        return map;
+                    }
                 }
-                String description = req.getParameter("description") == null?tx.getDescription():req.getParameter("description");
-                String merchant = req.getParameter("merchant") == null?tx.getMerchant():req.getParameter("merchant");
-                String amount = req.getParameter("amount") == null?String.valueOf(tx.getAmount()):req.getParameter("amount");
-                String date = req.getParameter("date") == null?tx.getDate():req.getParameter("date");
-                String category = req.getParameter("category") == null?tx.getCategory():req.getParameter("category");
-
-                tx.setId(txId);
-                tx.setDescription(description);
-                tx.setMerchant(merchant);
-                tx.setAmount(Double.parseDouble(amount));
-                tx.setDate(date);
-                tx.setCategory(category);
-                tx.setUser(user);
-
-                if(txDao.editTransaction(tx)==2){
-                    map.put("Code",201);
-                    map.put("Description","Created");
-                    map.put("Transaction",tx);
-                    return map;
-                }else{
-                    map.put("Code",400);
-                    map.put("Description","Bad Request");
+                else{
+                    map.put("Code", 401);
+                    map.put("Description", "Unauthorized");
                     return map;
                 }
             }

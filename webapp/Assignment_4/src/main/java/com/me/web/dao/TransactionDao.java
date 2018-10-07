@@ -1,6 +1,7 @@
 package com.me.web.dao;
 
 import com.me.web.pojo.Transaction;
+import com.me.web.pojo.User;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 
@@ -44,6 +45,28 @@ public class TransactionDao extends DAO{
             throw new Exception("Transaction not found: "+e.getMessage());
         }
 
+    }
+
+    public int authorizeUser(int txId, User user) throws Exception{
+        try{
+            Transaction tx = getTransactionById(txId);
+            if(tx != null){
+                if(tx.getUser().getId() == user.getId()){
+                    return 2;
+                }
+                else{
+                    return 3;
+                }
+
+            }
+            else{
+                return 3;
+            }
+        }
+        catch(HibernateException hex){
+            rollback();
+            throw new Exception("Unauthorized Access");
+        }
     }
 
     public int deleteTransaction(int id) throws Exception{
