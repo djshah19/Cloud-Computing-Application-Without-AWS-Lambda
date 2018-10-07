@@ -1,11 +1,15 @@
 package com.me.web.webapi_assignment3;
 
+import com.me.web.dao.AttachmentDao;
 import com.me.web.dao.TransactionDao;
 import com.me.web.dao.UserDao;
+import com.me.web.pojo.Attachment;
 import com.me.web.pojo.Transaction;
 import com.me.web.pojo.User;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
@@ -43,11 +47,58 @@ public class TransactionController {
                     tx.setDate(date);
                     tx.setCategory(category);
                     tx.setUser(user);
-                    if(txDao.insertTransaction(tx)==2){
+                    if(txDao.insertTransaction(tx,null)==2){
                         map.put("Description",tx);
                         map.put("Code",200);
                         return map;
                     }
+            }
+        }
+        map.put("Code",401);map.put("Description","Unauthorized");
+        return map;
+
+    }
+
+
+    @RequestMapping(value = "transaction/{id}/attachments", method = RequestMethod.POST)
+    public HashMap<String, Object> saveAttachments(@PathVariable("id") int id, HttpServletRequest req, TransactionDao txDao, AttachmentDao attachmentDao, UserDao userDao, @RequestPart("file") MultipartFile file) throws  Exception{
+        String headers = req.getHeader(HttpHeaders.AUTHORIZATION);
+        User user = null;
+        HashMap<String, Object> map = new HashMap<>();
+        if(headers != null) {
+            String base64Credentials = headers.substring("Basic".length()).trim();
+            byte[] credDecoded = Base64.getDecoder().decode(base64Credentials);
+            String credentials = new String(credDecoded, StandardCharsets.UTF_8);
+            final String[] values = credentials.split(":", 2);
+            user = userDao.verifyUser(values[0], values[1]);
+            if (user == null || user.getUsername().isEmpty()) {
+                map.put("Code",401);
+                map.put("Description","Unauthorized");
+                return map;
+            }else{
+                int txId = id;
+                if(txDao.authorizeUser(txId,user) == 2) {
+                    Transaction tx = txDao.getTransactionById(txId);
+                    Attachment attachment = new Attachment();
+                    attachment.setFilePath(file.getOriginalFilename());
+                    attachment.setFile(file);
+                    attachment.setTransaction(tx);
+                    if (attachmentDao.saveAttachment(attachment) == 2) {
+                        map.put("Description", attachment);
+                        map.put("Code", 200);
+                        return map;
+                    }
+                    else{
+                        map.put("Description", "Attachment unsuccessful");
+                        map.put("Code", 500);
+                        return map;
+                    }
+                }
+                else{
+                    map.put("Code", 401);
+                    map.put("Description", "Unauthorized");
+                    return map;
+                }
             }
         }
         map.put("Code",401);map.put("Description","Unauthorized");

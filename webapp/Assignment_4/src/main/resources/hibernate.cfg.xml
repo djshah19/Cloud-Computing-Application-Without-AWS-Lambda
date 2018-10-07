@@ -13,6 +13,6 @@
 
         <mapping class="com.me.web.pojo.User"/>
         <mapping class="com.me.web.pojo.Transaction"/>
-
+        <mapping class="com.me.web.pojo.Attachment"/>
     </session-factory>
 </hibernate-configuration>

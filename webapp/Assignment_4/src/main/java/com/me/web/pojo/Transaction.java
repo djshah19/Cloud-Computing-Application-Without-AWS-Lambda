@@ -1,7 +1,11 @@
 package com.me.web.pojo;
 
 
+import com.me.web.dao.AttachmentDao;
+
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name="transaction")
@@ -29,6 +33,9 @@ public class Transaction {
 
     @ManyToOne(cascade = {}, fetch = FetchType.LAZY, optional = false)
     private User user;
+
+    @Transient
+    private ArrayList<Attachment> attachmentList;
 
     public Transaction(){
 
@@ -88,5 +95,12 @@ public class Transaction {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public List<Attachment> getAttachmentList(int id) throws Exception{
+        attachmentList = new ArrayList<>();
+        AttachmentDao attachmentDao = new AttachmentDao();
+        //attachmentList = attachmentDao.getAttachmentByTransaction(id);
+        return attachmentList;
     }
 }
