@@ -19,11 +19,11 @@ public class Attachment {
     @ManyToOne()
     private Transaction transaction;
 
-    @Column(name="file_path")
-    private String filePath;
-
-    @Transient
-    private MultipartFile file;
+//    @Column(name="file_path")
+//    private String filePath;
+//
+//    @Transient
+//    private MultipartFile file;
 
     public Attachment(){}
 
@@ -32,21 +32,21 @@ public class Attachment {
 
     public Transaction getTransaction(){ return transaction;}
 
-    public String getFilePath(){return filePath;}
-
-    public MultipartFile getFile() {
-        return file;
-    }
+//    public String getFilePath(){return filePath;}
+//
+//    public MultipartFile getFile() {
+//        return file;
+//    }
 
     public void setId(int id){ this.id = id;}
 
 
     public void setTransaction(Transaction transaction){ this.transaction = transaction;}
 
-    public void setFilePath(String filePath){this.filePath = filePath;}
-
-    public void setFile(MultipartFile file) {
-        this.file = file;
-    }
+//    public void setFilePath(String filePath){this.filePath = filePath;}
+//
+//    public void setFile(MultipartFile file) {
+//        this.file = file;
+//    }
 
 }

@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.*;
@@ -80,12 +81,18 @@ public class TransactionController {
                 if(txDao.authorizeUser(txId,user) == 2) {
                     Transaction tx = txDao.getTransactionById(txId);
                     Attachment attachment = new Attachment();
-                    attachment.setFilePath(file.getOriginalFilename());
-                    attachment.setFile(file);
+//                    attachment.setFilePath(file.getOriginalFilename());
+//                    attachment.setFile(file);
                     attachment.setTransaction(tx);
                     if (attachmentDao.saveAttachment(attachment) == 2) {
                         map.put("Description", attachment);
                         map.put("Code", 200);
+
+//                        MultipartFile file = req.getHeader("file");
+                        File destFile = new File("/home/dhwanishah/Documents/uploads/"+attachment.getId());
+                        if(file!=null && !file.isEmpty()){
+                            file.transferTo(destFile);
+                        }
                         return map;
                     }
                     else{
@@ -151,6 +158,60 @@ public class TransactionController {
         map.put("Code",401);
         map.put("Description","Unauthorized");
         return map;
+    }
+
+    @RequestMapping(value = "transaction/{id}/attachments/{idAttachments}", method = RequestMethod.POST)
+    public HashMap<String, Object> deleteAttachments(@PathVariable("id") int id, @PathVariable("idAttachments") int idAt,HttpServletRequest req, TransactionDao txDao, AttachmentDao attachmentDao, UserDao userDao) throws  Exception{
+        String headers = req.getHeader(HttpHeaders.AUTHORIZATION);
+        User user = null;
+        HashMap<String, Object> map = new HashMap<>();
+        if(headers != null) {
+            String base64Credentials = headers.substring("Basic".length()).trim();
+            byte[] credDecoded = Base64.getDecoder().decode(base64Credentials);
+            String credentials = new String(credDecoded, StandardCharsets.UTF_8);
+            final String[] values = credentials.split(":", 2);
+            user = userDao.verifyUser(values[0], values[1]);
+            if (user == null || user.getUsername().isEmpty()) {
+                map.put("Code",401);
+                map.put("Description","Unauthorized");
+                return map;
+            }else{
+                int txId = id;
+                if(txDao.authorizeUser(txId,user) == 2) {
+                    Transaction tx = txDao.getTransactionById(txId);
+                    Attachment attachment = new Attachment();
+//                    attachment.setFilePath(file.getOriginalFilename());
+//                    attachment.setFile(file);
+                    attachment.setTransaction(tx);
+                    attachment.setId(idAt);
+                    if (attachmentDao.deleteAttachment(attachment) == 2) {
+                        map.put("Code", 204);
+                        map.put("Description", "Attachment Successfully Deleted");
+
+
+//                        MultipartFile file = req.getHeader("file");
+                        File destFile = new File("/home/dhwanishah/Documents/uploads/"+attachment.getId());
+                        if(destFile.exists()){
+                            destFile.delete();
+                        }
+                        return map;
+                    }
+                    else{
+                        map.put("Code", 500);
+                        map.put("Description", "Attachment not Deleted");
+                        return map;
+                    }
+                }
+                else{
+                    map.put("Code", 401);
+                    map.put("Description", "Unauthorized");
+                    return map;
+                }
+            }
+        }
+        map.put("Code",401);map.put("Description","Unauthorized");
+        return map;
+
     }
 
     @RequestMapping(value="transaction/{id}", method = RequestMethod.PUT)
@@ -247,4 +308,50 @@ public class TransactionController {
         map.put("Code",401);
         map.put("Description", "Unauthorized");
         return map;
-}}
+}
+
+    @RequestMapping(value = "transaction/{id}/attachments", method = RequestMethod.GET)
+    public HashMap<String, Object> getAllAttachments(@PathVariable("id") int id, HttpServletRequest req, TransactionDao txDao, AttachmentDao attachmentDao, UserDao userDao) throws  Exception{
+        String headers = req.getHeader(HttpHeaders.AUTHORIZATION);
+        User user = null;
+        HashMap<String, Object> map = new HashMap<>();
+        if(headers != null) {
+            String base64Credentials = headers.substring("Basic".length()).trim();
+            byte[] credDecoded = Base64.getDecoder().decode(base64Credentials);
+            String credentials = new String(credDecoded, StandardCharsets.UTF_8);
+            final String[] values = credentials.split(":", 2);
+            user = userDao.verifyUser(values[0], values[1]);
+            if (user == null || user.getUsername().isEmpty()) {
+                map.put("Code",401);
+                map.put("Description","Unauthorized");
+                return map;
+            }else{
+
+                int txId = id;
+                if(txDao.authorizeUser(txId,user) == 2) {
+                    List<Attachment> list = attachmentDao.getAllAttachments(id);
+                    if (list.isEmpty()) {
+                        map.put("Code", 200);
+                        map.put("Description", "No attachment found");
+
+                        return map;
+                    }
+                    else{
+                        map.put("Code", 500);
+                        map.put("Description", "OK");
+                        map.put("Attachment", list);
+                        return map;
+                    }
+                }
+                else{
+                    map.put("Code", 401);
+                    map.put("Description", "Unauthorized");
+
+                    return map;
+                }
+            }
+        }
+        map.put("Code",401);map.put("Description","Unauthorized");
+        return map;
+    }
+}

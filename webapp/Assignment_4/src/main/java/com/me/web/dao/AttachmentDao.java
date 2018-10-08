@@ -1,6 +1,7 @@
 package com.me.web.dao;
 
 import com.me.web.pojo.Attachment;
+import com.me.web.pojo.Transaction;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.springframework.context.ApplicationContext;
@@ -12,37 +13,73 @@ import java.util.List;
 
 public class AttachmentDao extends DAO{
 
-    private String url = "/Downloads/";
 
-    public int saveAttachment(Attachment attachment){
+    public int saveAttachment(Attachment attachment) throws Exception{
         try{
             begin();
             getSession().save(attachment);
             commit();
-            if(storeAttachment(attachment) == 2)
-                return 2;
-            else{
-                return 1;
-            }
+        return 2;
         }
-        catch(Exception ex){
-            System.out.println("Exception Message:"+ex.getMessage());
+        catch(HibernateException e){
+            rollback();
+            throw new Exception("Attachment not saved: "+e.getMessage());
         }
-        return 1;
     }
 
-    public int storeAttachment(Attachment file){
+
+    public Attachment getAttachmentById(int id) throws Exception{
         try {
-            MultipartFile fileInMemory = file.getFile();
-            java.io.File destFile = new java.io.File(url, fileInMemory.getOriginalFilename());
-            fileInMemory.transferTo(destFile);
-            return 2;
+            char flag = ' ';
+            if(!getSession().getTransaction().isActive())
+            {
+                begin();
+                flag = 'X';
+            }
+            Attachment attachment = (Attachment)getSession().get(Attachment.class, id);
+            if(flag=='X'){
+                commit();
+            }
+            if(attachment!=null){
+                return attachment;
+            }else{
+                return null;
+            }
+        }catch(HibernateException e){
+            rollback();
+            throw new Exception("Attachment not found: "+e.getMessage());
         }
-        catch(Exception ex){
-            System.out.println("Exception Message:" + ex.getMessage());
-        }
-        return 0;
+
     }
+
+    public int deleteAttachment(Attachment attachment) throws Exception{
+        try{
+            begin();
+            if(attachment!=null){
+                getSession().delete(attachment);
+                commit();
+                return 2;
+            }
+                return 1;
+        }
+        catch(HibernateException e){
+            rollback();
+            throw  new Exception("Attachment not Deleted: "+e.getMessage());
+        }
+    }
+
+//    public int storeAttachment(Attachment file){
+//        try {
+//            MultipartFile fileInMemory = file.getFile();
+//            java.io.File destFile = new java.io.File(url, fileInMemory.getOriginalFilename());
+//            fileInMemory.transferTo(destFile);
+//            return 2;
+//        }
+//        catch(Exception ex){
+//            System.out.println("Exception Message:" + ex.getMessage());
+//        }
+//        return 0;
+//    }
 
     /*
     public ArrayList<Attachment> getAttachmentByTransaction(int id) throws Exception{
@@ -60,4 +97,19 @@ public class AttachmentDao extends DAO{
         return (ArrayList<Attachment>) attachmentList;
     }
     */
+
+    public List<Attachment> getAllAttachments(int id)throws Exception{
+        try{
+            begin();
+            Query q = getSession().createQuery("from Attachment where transaction_id = :id");
+            q.setInteger("id", id);
+            List<Attachment> list = q.getResultList();
+            commit();
+            return list;
+
+        }catch (HibernateException e){
+            rollback();
+            throw new Exception("Exception while getting attachments"+e.getMessage());
+        }
+    }
 }
