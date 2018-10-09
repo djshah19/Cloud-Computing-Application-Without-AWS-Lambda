@@ -1,6 +1,8 @@
 package com.me.web.pojo;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.me.web.dao.AttachmentDao;
 
 import javax.persistence.*;
@@ -35,12 +37,13 @@ public class Transaction {
     private User user;
 
     @Transient
+    @JsonManagedReference
     private ArrayList<Attachment> attachmentList;
 
     public Transaction(){
 
     }
-
+    @JsonIgnore
     public User getUser() {
         return user;
     }
@@ -97,10 +100,23 @@ public class Transaction {
         this.category = category;
     }
 
-    public List<Attachment> getAttachmentList(int id) throws Exception{
-        attachmentList = new ArrayList<>();
-        AttachmentDao attachmentDao = new AttachmentDao();
-        //attachmentList = attachmentDao.getAttachmentByTransaction(id);
+//    public List<Attachment> getAttachmentList(int id) throws Exception{
+//        attachmentList = new ArrayList<>();
+//        AttachmentDao attachmentDao = new AttachmentDao();
+//        //attachmentList = attachmentDao.getAttachmentByTransaction(id);
+//        return attachmentList;
+//    }
+    public ArrayList<Attachment> getAttachmentList() {
+        return attachmentList;
+    }
+
+    public void setAttachmentList(ArrayList<Attachment> attachmentList) {
+        this.attachmentList = attachmentList;
+    }
+
+    public List<Attachment> addAttachment(Attachment attachment){
+         this.attachmentList = new ArrayList<>();
+        attachmentList.add(attachment);
         return attachmentList;
     }
 }

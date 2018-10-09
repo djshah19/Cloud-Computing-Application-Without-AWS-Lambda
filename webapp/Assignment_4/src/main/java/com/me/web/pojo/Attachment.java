@@ -1,5 +1,6 @@
 package com.me.web.pojo;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import org.hibernate.annotations.CollectionId;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,6 +18,7 @@ public class Attachment {
 
 
     @ManyToOne()
+    @JsonBackReference
     private Transaction transaction;
 
 //    @Column(name="file_path")

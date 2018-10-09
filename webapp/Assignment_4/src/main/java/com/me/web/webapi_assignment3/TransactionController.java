@@ -21,7 +21,7 @@ import java.util.*;
 public class TransactionController {
 
     @RequestMapping(value = "transaction", method = RequestMethod.POST)
-    public HashMap<String, Object> saveTransaction(HttpServletRequest req, TransactionDao txDao, UserDao userDao) throws  Exception{
+    public HashMap<String, Object> saveTransaction(HttpServletRequest req, TransactionDao txDao, UserDao userDao, AttachmentDao attachmentDao, @RequestPart("file") MultipartFile file) throws  Exception{
         String headers = req.getHeader(HttpHeaders.AUTHORIZATION);
         User user = null;
         HashMap<String, Object> map = new HashMap<>();
@@ -48,7 +48,20 @@ public class TransactionController {
                     tx.setDate(date);
                     tx.setCategory(category);
                     tx.setUser(user);
-                    if(txDao.insertTransaction(tx,null)==2){
+                    if(txDao.insertTransaction(tx)==2){
+                        Attachment attachment = new Attachment();
+                        attachment.setTransaction(tx);
+
+                        if (attachmentDao.saveAttachment(attachment) == 2) {
+                            tx.addAttachment(attachment);
+                            List<Attachment> list = tx.getAttachmentList();
+                            System.out.println(list);
+                            File destFile = new File("/home/dhwanishah/Documents/uploads/"+attachment.getId());
+                            if(file!=null && !file.isEmpty()){
+                                file.transferTo(destFile);
+                            }
+                        }
+
                         map.put("Description",tx);
                         map.put("Code",200);
                         return map;
@@ -160,7 +173,7 @@ public class TransactionController {
         return map;
     }
 
-    @RequestMapping(value = "transaction/{id}/attachments/{idAttachments}", method = RequestMethod.POST)
+    @RequestMapping(value = "transaction/{id}/attachments/{idAttachments}", method = RequestMethod.DELETE)
     public HashMap<String, Object> deleteAttachments(@PathVariable("id") int id, @PathVariable("idAttachments") int idAt,HttpServletRequest req, TransactionDao txDao, AttachmentDao attachmentDao, UserDao userDao) throws  Exception{
         String headers = req.getHeader(HttpHeaders.AUTHORIZATION);
         User user = null;

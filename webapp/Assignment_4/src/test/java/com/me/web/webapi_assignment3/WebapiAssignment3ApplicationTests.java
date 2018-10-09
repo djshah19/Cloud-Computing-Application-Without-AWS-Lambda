@@ -32,7 +32,7 @@ public class WebapiAssignment3ApplicationTests {
             UserDao uDao = new UserDao();
             User ur = uDao.verifyUser("root","root");
             tx.setUser(ur);
-            int val = transactionDAO.insertTransaction(tx,null);
+            int val = transactionDAO.insertTransaction(tx);
             assertEquals(2, val);
         }
         catch(Exception ex){

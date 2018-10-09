@@ -11,15 +11,11 @@ import java.util.List;
 
 public class TransactionDao extends DAO{
 
-    public int insertTransaction(Transaction transaction, Attachment attachment) throws Exception{
+    public int insertTransaction(Transaction transaction) throws Exception{
        try{
            begin();
            getSession().save(transaction);
            commit();
-           if(attachment != null){
-               AttachmentDao attachmentDao = new AttachmentDao();
-               attachmentDao.saveAttachment(attachment);
-           }
            return 2;
        } catch(HibernateException e){
            rollback();
