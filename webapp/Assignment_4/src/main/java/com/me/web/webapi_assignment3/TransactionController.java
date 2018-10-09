@@ -128,7 +128,7 @@ public class TransactionController {
 
 
     @RequestMapping(value="transaction/{id}", method = RequestMethod.DELETE)
-    public HashMap<String, Object> deleteTransaction(@PathVariable("id") int id, HttpServletRequest req, TransactionDao txDao, UserDao userDao) throws  Exception{
+    public HashMap<String, Object> deleteTransaction(@PathVariable("id") int id, HttpServletRequest req, TransactionDao txDao, UserDao userDao, AttachmentDao attachmentDao) throws  Exception{
         String headers = req.getHeader(HttpHeaders.AUTHORIZATION);
         User user = null;
         HashMap<String, Object> map = new HashMap<>();
@@ -146,7 +146,15 @@ public class TransactionController {
                 int txId = id;
                 if(txId != 0){
                     if(txDao.authorizeUser(txId,user) == 2) {
+                        List<Attachment> list = attachmentDao.getAllAttachments(id);
                         if (txDao.deleteTransaction(txId) == 2) {
+                            if(!list.isEmpty()){
+                                for(Attachment attachment : list){
+                                File destFile = new File("/home/dhwanishah/Documents/uploads/"+attachment.getId());
+                                if(destFile.exists()){
+                                    destFile.delete();
+                                }}
+                            }
                             map.put("Code", 200);
                             map.put("Description", "Successfully Deleted");
                             return map;
