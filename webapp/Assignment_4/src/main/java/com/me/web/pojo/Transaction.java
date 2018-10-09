@@ -36,9 +36,9 @@ public class Transaction {
     @ManyToOne(cascade = {}, fetch = FetchType.LAZY, optional = false)
     private User user;
 
-    @Transient
+    @OneToMany(mappedBy = "transaction", cascade = CascadeType.ALL)
     @JsonManagedReference
-    private ArrayList<Attachment> attachmentList;
+    private List<Attachment> attachmentList = new ArrayList<Attachment>();
 
     public Transaction(){
 
@@ -106,7 +106,7 @@ public class Transaction {
 //        //attachmentList = attachmentDao.getAttachmentByTransaction(id);
 //        return attachmentList;
 //    }
-    public ArrayList<Attachment> getAttachmentList() {
+    public List<Attachment> getAttachmentList() {
         return attachmentList;
     }
 
@@ -115,7 +115,6 @@ public class Transaction {
     }
 
     public List<Attachment> addAttachment(Attachment attachment){
-         this.attachmentList = new ArrayList<>();
         attachmentList.add(attachment);
         return attachmentList;
     }
