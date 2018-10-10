@@ -99,7 +99,7 @@
                 
             }
         }, 
-        "DBSecurityGroup" : {
+        "DBSecurityGroup" : {   
             "Type" : "AWS::EC2::SecurityGroup",
             "Properties" : {
                 "GroupName" : "csye6225-rds",
@@ -115,6 +115,28 @@
                 ]
                 
             }
-        }         
+        },
+        
+        "DynamoDBTable" : {
+            "Type" : "AWS::DynamoDB::Table",
+            "Properties" : {
+                "AttributeDefinitions" : [ {"AttributeName": "id",
+                                            "AttributeType": "S"} ],
+                
+                "KeySchema" : [ {"AttributeName" : "id",
+                                 "KeyType" : "HASH"} ],
+                
+                
+                "ProvisionedThroughput" : {"ReadCapacityUnits": "5",
+                                           "WriteCapacityUnits" : "5"},
+                
+                
+                "TableName" : "csye6225",
+                
+                
+            }
+        }
+        
+        
     }
 }
