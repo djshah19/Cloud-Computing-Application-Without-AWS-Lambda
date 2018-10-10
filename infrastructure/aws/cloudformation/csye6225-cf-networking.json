@@ -68,9 +68,16 @@
     	    "EnableDnsSupport" : "false",
     	    "EnableDnsHostnames" : "false",
             "InstanceTenancy" : "default",
-            "Tags" : [ {"Key" : "foo", "Value" : "bar"} ]
-         }
-      },
+            
+         
+         
+         "Tags" : [
+            { "Key" : "Application", "Value" : { "Ref" : "AWS::StackName" } },
+            { "Key" : "Network", "Value" : "Public" },
+            { "Key" : "Name", "Value" : "NAT VPC" }
+            ]
+            }
+    },
 
     "PublicSubnet1" : {
          "Type" : "AWS::EC2::Subnet",
@@ -78,8 +85,17 @@
             "VpcId" : { "Ref" : "myVPC" },
             "CidrBlock" : { "Ref" : "VPCPuSubnetCidrBlock1" },
             "AvailabilityZone" : { "Ref" : "AvailabilityZone1" },
-            "Tags" : [ { "Key" : "foo", "Value" : "bar" } ]
-         }
+            
+            
+         
+         
+         "Tags" : [
+            { "Key" : "Application", "Value" : { "Ref" : "AWS::StackName" } },
+            { "Key" : "Network", "Value" : "Public" },
+            { "Key" : "Name", "Value" : "Public Subnet 1" }
+            ]
+            
+            }
       },
 
           "PublicSubnet2" : {
@@ -88,8 +104,14 @@
             "VpcId" : { "Ref" : "myVPC" },
             "CidrBlock" : { "Ref" : "VPCPuSubnetCidrBlock2" },
             "AvailabilityZone" : { "Ref" : "AvailabilityZone2" },
-            "Tags" : [ { "Key" : "foo", "Value" : "bar" } ]
+            "Tags" : [
+            { "Key" : "Application", "Value" : { "Ref" : "AWS::StackName" } },
+            { "Key" : "Network", "Value" : "Public" },
+            { "Key" : "Name", "Value" : "Public Subnet 2" }
+            ]
          }
+         
+         
       },
 
           "PublicSubnet3" : {
@@ -98,8 +120,13 @@
             "VpcId" : { "Ref" : "myVPC" },
             "CidrBlock" : { "Ref" : "VPCPuSubnetCidrBlock3" },
             "AvailabilityZone" : { "Ref" : "AvailabilityZone3" },
-            "Tags" : [ { "Key" : "foo", "Value" : "bar" } ]
+            "Tags" : [
+            { "Key" : "Application", "Value" : { "Ref" : "AWS::StackName" } },
+            { "Key" : "Network", "Value" : "Public" },
+            { "Key" : "Name", "Value" : "Public Subnet 3" }
+            ]
          }
+         
       },
    
       "PrivateSubnet1" : {
@@ -108,8 +135,14 @@
             "VpcId" : { "Ref" : "myVPC" },
             "CidrBlock" : { "Ref" : "VPCPrSubnetCidrBlock1" },
             "AvailabilityZone" : { "Ref" : "AvailabilityZone1" },
-            "Tags" : [ { "Key" : "foo", "Value" : "bar" } ]
+            "Tags" : [
+            { "Key" : "Application", "Value" : { "Ref" : "AWS::StackName" } },
+            { "Key" : "Network", "Value" : "Private" },
+            { "Key" : "Name", "Value" : "Private Subnet 1" }
+            ]
          }
+         
+         
       },
 
             "PrivateSubnet2" : {
@@ -118,8 +151,15 @@
             "VpcId" : { "Ref" : "myVPC" },
             "CidrBlock" : { "Ref" : "VPCPrSubnetCidrBlock2" },
             "AvailabilityZone" : { "Ref" : "AvailabilityZone2" },
-            "Tags" : [ { "Key" : "foo", "Value" : "bar" } ]
+             "Tags" : [
+          { "Key" : "Application", "Value" : { "Ref" : "AWS::StackName" } },
+          { "Key" : "Network", "Value" : "Private" },
+	  { "Key" : "Name", "Value" : "Private Subnet 2" }
+]
          }
+        
+         
+         
       },
 
             "PrivateSubnet3" : {
@@ -128,35 +168,73 @@
             "VpcId" : { "Ref" : "myVPC" },
             "CidrBlock" : { "Ref" : "VPCPrSubnetCidrBlock3" },
             "AvailabilityZone" : { "Ref" : "AvailabilityZone3" },
-            "Tags" : [ { "Key" : "foo", "Value" : "bar" } ]
+            "Tags" : [
+          { "Key" : "Application", "Value" : { "Ref" : "AWS::StackName" } },
+          { "Key" : "Network", "Value" : "Private" },
+	  { "Key" : "Name", "Value" : "Private Subnet 3" }
+]
          }
+         
+         
       },
 
                   "myInternetGateway" : {
          "Type" : "AWS::EC2::InternetGateway",
          "Properties" : {
-            "Tags" : [ {"Key" : "foo", "Value" : "bar"}]
+             "Tags" : [
+          { "Key" : "Application", "Value" : { "Ref" : "AWS::StackName" } },
+          { "Key" : "Network", "Value" : "Public" }
+]
          }
       },
 
+      
+  
 
-"AttachGateway" : {
-   "Type" : "AWS::EC2::VPCGatewayAttachment",
-   "Properties" : {
-      "VpcId" : { "Ref" : "myVPC" },
-      "InternetGatewayId" : { "Ref" : "myInternetGateway" }
+    "AttachGateway" : {
+        "DependsOn" : ["myVPC", "myInternetGateway"],
+        "Type" : "AWS::EC2::VPCGatewayAttachment",
+        "Properties" : {
+            "VpcId" : { "Ref" : "myVPC" },
+            "InternetGatewayId" : { "Ref" : "myInternetGateway" }
+   }
+},
+
+    "AttachGateway2" : {
+        "DependsOn" : ["myVPC", "myInternetGateway"],
+        "Type" : "AWS::EC2::VPCGatewayAttachment",
+        "Properties" : {
+            "VpcId" : { "Ref" : "myVPC" },
+            "InternetGatewayId" : { "Ref" : "myInternetGateway" }
    }
 },
 
       "PublicRouteTable" : {
+         "DependsOn" : ["myVPC"],
          "Type" : "AWS::EC2::RouteTable",
          "Properties" : {
             "VpcId" : { "Ref" : "myVPC" },
-            "Tags" : [ { "Key" : "foo", "Value" : "bar" } ]
+            "Tags" : [
+                { "Key" : "Application", "Value" : { "Ref" : "AWS::StackName" } },
+                { "Key" : "Network", "Value" : "Public" }
+                    ]
+         }
+      },
+      
+            "PrivateRouteTable" : {
+         "DependsOn" : ["myVPC"],   
+         "Type" : "AWS::EC2::RouteTable",
+         "Properties" : {
+            "VpcId" : { "Ref" : "myVPC" },
+            "Tags" : [
+                { "Key" : "Application", "Value" : { "Ref" : "AWS::StackName" } },
+                { "Key" : "Network", "Value" : "Private" }
+                    ]
          }
       },
 
-     "mySubnetRouteTableAssociation" : {
+     "mySubnetRouteTableAssociation1" : {
+         "DependsOn" : ["PublicSubnet1", "PublicRouteTable"],
          "Type" : "AWS::EC2::SubnetRouteTableAssociation",
          "Properties" : {
             "SubnetId" : { "Ref" : "PublicSubnet1" },
@@ -164,7 +242,8 @@
          }
       },
 
-           "mySubnetRouteTableAssociation" : {
+           "mySubnetRouteTableAssociation2" : {
+         "DependsOn" : ["PublicSubnet2", "PublicRouteTable"],
          "Type" : "AWS::EC2::SubnetRouteTableAssociation",
          "Properties" : {
             "SubnetId" : { "Ref" : "PublicSubnet2" },
@@ -172,43 +251,59 @@
          }
       },
 
-           "mySubnetRouteTableAssociation" : {
-         "Type" : "AWS::EC2::SubnetRouteTableAssociation",
-         "Properties" : {
-            "SubnetId" : { "Ref" : "PublicSubnet3" },
-            "RouteTableId" : { "Ref" : "PublicRouteTable" }
+           "mySubnetRouteTableAssociation3" : {
+            "DependsOn" : ["PublicSubnet3", "PublicRouteTable"],
+            "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties" : {
+                "SubnetId" : { "Ref" : "PublicSubnet3" },
+                "RouteTableId" : { "Ref" : "PublicRouteTable" }
          }
       },
 
-           "mySubnetRouteTableAssociation" : {
+           "mySubnetRouteTableAssociation4" : {
+         "DependsOn" : ["PrivateSubnet1", "PrivateRouteTable"],
          "Type" : "AWS::EC2::SubnetRouteTableAssociation",
          "Properties" : {
             "SubnetId" : { "Ref" : "PrivateSubnet1" },
-            "RouteTableId" : { "Ref" : "PublicRouteTable" }
+            "RouteTableId" : { "Ref" : "PrivateRouteTable" }
          }
       },
 
-           "mySubnetRouteTableAssociation" : {
+           "mySubnetRouteTableAssociation5" : {
+         "DependsOn" : ["PrivateSubnet2", "PrivateRouteTable"],
          "Type" : "AWS::EC2::SubnetRouteTableAssociation",
          "Properties" : {
             "SubnetId" : { "Ref" : "PrivateSubnet2" },
-            "RouteTableId" : { "Ref" : "PublicRouteTable" }
+            "RouteTableId" : { "Ref" : "PrivateRouteTable" }
          }
       },
 
-           "mySubnetRouteTableAssociation" : {
+           "mySubnetRouteTableAssociation6" : {
+         "DependsOn" : ["PrivateSubnet3", "PrivateRouteTable"],
          "Type" : "AWS::EC2::SubnetRouteTableAssociation",
          "Properties" : {
             "SubnetId" : { "Ref" : "PrivateSubnet3" },
-            "RouteTableId" : { "Ref" : "PublicRouteTable" }
+            "RouteTableId" : { "Ref" : "PrivateRouteTable" }
          }
       },
 
       "PublicRoute" : {
+         "DependsOn" : ["PublicRouteTable", "myInternetGateway"],
          "Type" : "AWS::EC2::Route",
          "DependsOn" : "AttachGateway",
          "Properties" : {
             "RouteTableId" : { "Ref" : "PublicRouteTable" },
+            "DestinationCidrBlock" : { "Ref" : "DestinationCidrBlock" },
+            "GatewayId" : { "Ref" : "myInternetGateway" }
+         }
+      },
+      
+            "PrivateRoute" : {
+         "DependsOn" : ["PrivateRouteTable", "myInternetGateway"],   
+         "Type" : "AWS::EC2::Route",
+         "DependsOn" : "AttachGateway",
+         "Properties" : {
+            "RouteTableId" : { "Ref" : "PrivateRouteTable" },
             "DestinationCidrBlock" : { "Ref" : "DestinationCidrBlock" },
             "GatewayId" : { "Ref" : "myInternetGateway" }
          }
