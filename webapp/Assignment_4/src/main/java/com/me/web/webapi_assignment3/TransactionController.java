@@ -6,6 +6,8 @@ import com.me.web.dao.UserDao;
 import com.me.web.pojo.Attachment;
 import com.me.web.pojo.Transaction;
 import com.me.web.pojo.User;
+import org.hibernate.cfg.Environment;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,8 +22,12 @@ import java.util.*;
 @RestController
 public class TransactionController {
 
+    @Value("${storagepath}")
+    String storagePath;
+
     @RequestMapping(value = "transaction", method = RequestMethod.POST)
     public HashMap<String, Object> saveTransaction(HttpServletRequest req, TransactionDao txDao, UserDao userDao, AttachmentDao attachmentDao, @RequestPart("file") MultipartFile file) throws  Exception{
+
         String headers = req.getHeader(HttpHeaders.AUTHORIZATION);
         User user = null;
         HashMap<String, Object> map = new HashMap<>();
@@ -56,7 +62,7 @@ public class TransactionController {
                             tx.addAttachment(attachment);
                             List<Attachment> list = tx.getAttachmentList();
                             System.out.println(list);
-                            File destFile = new File("/home/dhwanishah/Documents/uploads/"+attachment.getId());
+                            File destFile = new File(storagePath+attachment.getId());
                             if(file!=null && !file.isEmpty()){
                                 file.transferTo(destFile);
                             }
@@ -102,7 +108,7 @@ public class TransactionController {
                         map.put("Code", 200);
 
 //                        MultipartFile file = req.getHeader("file");
-                        File destFile = new File("/home/dhwanishah/Documents/uploads/"+attachment.getId());
+                        File destFile = new File(storagePath+attachment.getId());
                         if(file!=null && !file.isEmpty()){
                             file.transferTo(destFile);
                         }
@@ -150,7 +156,7 @@ public class TransactionController {
                         if (txDao.deleteTransaction(txId) == 2) {
                             if(!list.isEmpty()){
                                 for(Attachment attachment : list){
-                                File destFile = new File("/home/dhwanishah/Documents/uploads/"+attachment.getId());
+                                File destFile = new File(storagePath+attachment.getId());
                                 if(destFile.exists()){
                                     destFile.delete();
                                 }}
@@ -211,7 +217,7 @@ public class TransactionController {
 
 
 //                        MultipartFile file = req.getHeader("file");
-                        File destFile = new File("/home/dhwanishah/Documents/uploads/"+attachment.getId());
+                        File destFile = new File(storagePath+attachment.getId());
                         if(destFile.exists()){
                             destFile.delete();
                         }
@@ -298,6 +304,8 @@ public class TransactionController {
 
     @RequestMapping(value="transaction", method = RequestMethod.GET)
     public HashMap<String, Object> getAllTransaction(HttpServletRequest req, TransactionDao txDao, UserDao userDao) throws  Exception{
+
+
         String headers = req.getHeader(HttpHeaders.AUTHORIZATION);
         HashMap<String, Object> map = new HashMap<>();
         User user = null;
