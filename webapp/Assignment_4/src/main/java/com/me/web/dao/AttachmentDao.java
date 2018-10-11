@@ -39,6 +39,7 @@ public class AttachmentDao extends DAO{
             Attachment attachment = (Attachment)getSession().get(Attachment.class, id);
             if(flag=='X'){
                 commit();
+                getSession().clear();
             }
             if(attachment!=null){
                 return attachment;
@@ -111,5 +112,18 @@ public class AttachmentDao extends DAO{
             rollback();
             throw new Exception("Exception while getting attachments"+e.getMessage());
         }
+    }
+
+    public int editAttachments(Attachment at)throws Exception{
+        try{
+            begin();
+            getSession().saveOrUpdate(at);
+            commit();
+            return 2;
+        }catch (HibernateException e){
+            rollback();
+            throw new Exception("Exception while updating attachment"+e.getMessage());
+        }
+
     }
 }

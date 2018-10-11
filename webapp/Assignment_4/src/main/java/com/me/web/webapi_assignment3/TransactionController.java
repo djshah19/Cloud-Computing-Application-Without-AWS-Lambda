@@ -6,17 +6,16 @@ import com.me.web.dao.UserDao;
 import com.me.web.pojo.Attachment;
 import com.me.web.pojo.Transaction;
 import com.me.web.pojo.User;
-import org.hibernate.cfg.Environment;
+import com.me.web.service.AmazonClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.sql.Timestamp;
 import java.util.*;
 
 @RestController
@@ -24,6 +23,12 @@ public class TransactionController {
 
     @Value("${storagepath}")
     String storagePath;
+
+    @Value("${run}")
+    String run;
+
+    @Autowired
+    private AmazonClient amazonClient;
 
     @RequestMapping(value = "transaction", method = RequestMethod.POST)
     public HashMap<String, Object> saveTransaction(HttpServletRequest req, TransactionDao txDao, UserDao userDao, AttachmentDao attachmentDao, @RequestPart("file") MultipartFile file) throws  Exception{
@@ -55,18 +60,27 @@ public class TransactionController {
                     tx.setCategory(category);
                     tx.setUser(user);
                     if(txDao.insertTransaction(tx)==2){
+                        if(!file.isEmpty() || file!=null){
                         Attachment attachment = new Attachment();
                         attachment.setTransaction(tx);
 
                         if (attachmentDao.saveAttachment(attachment) == 2) {
                             tx.addAttachment(attachment);
-                            List<Attachment> list = tx.getAttachmentList();
-                            System.out.println(list);
+                            if(run.equalsIgnoreCase("dev")){
                             File destFile = new File(storagePath+attachment.getId());
                             if(file!=null && !file.isEmpty()){
                                 file.transferTo(destFile);
+                                attachment.setUrl(storagePath+attachment.getId());
+                                attachmentDao.editAttachments(attachment);
                             }
-                        }
+                            }
+                             else if(run.equalsIgnoreCase("aws"))
+                            {
+                                String fileUrl = this.amazonClient.uploadFile(file, String.valueOf(attachment.getId()));
+                                attachment.setUrl(fileUrl);
+                                attachmentDao.editAttachments(attachment);
+                            }
+                        }}
 
                         map.put("Description",tx);
                         map.put("Code",200);
@@ -100,17 +114,23 @@ public class TransactionController {
                 if(txDao.authorizeUser(txId,user) == 2) {
                     Transaction tx = txDao.getTransactionById(txId);
                     Attachment attachment = new Attachment();
-//                    attachment.setFilePath(file.getOriginalFilename());
-//                    attachment.setFile(file);
                     attachment.setTransaction(tx);
                     if (attachmentDao.saveAttachment(attachment) == 2) {
                         map.put("Description", attachment);
                         map.put("Code", 200);
 
 //                        MultipartFile file = req.getHeader("file");
+                        if(run.equalsIgnoreCase("dev")){
                         File destFile = new File(storagePath+attachment.getId());
                         if(file!=null && !file.isEmpty()){
                             file.transferTo(destFile);
+                            attachment.setUrl(storagePath+attachment.getId());
+                            attachmentDao.editAttachments(attachment);
+                        }}
+                        else if(run.equalsIgnoreCase("aws")){
+                                String fileUrl = this.amazonClient.uploadFile(file, String.valueOf(attachment.getId()));
+                                   attachment.setUrl(fileUrl);
+                                   attachmentDao.editAttachments(attachment);
                         }
                         return map;
                     }
@@ -156,10 +176,14 @@ public class TransactionController {
                         if (txDao.deleteTransaction(txId) == 2) {
                             if(!list.isEmpty()){
                                 for(Attachment attachment : list){
-                                File destFile = new File(storagePath+attachment.getId());
+                                    if(run.equalsIgnoreCase("dev")){
+                                File destFile = new File(attachment.getUrl());
                                 if(destFile.exists()){
                                     destFile.delete();
-                                }}
+                                }}else if(run.equalsIgnoreCase("aws")){
+                                        amazonClient.deleteFileFromS3Bucket(attachment.getUrl());
+                                    }
+                                }
                             }
                             map.put("Code", 200);
                             map.put("Description", "Successfully Deleted");
@@ -211,16 +235,20 @@ public class TransactionController {
 //                    attachment.setFile(file);
                     attachment.setTransaction(tx);
                     attachment.setId(idAt);
+                    Attachment at = attachmentDao.getAttachmentById(idAt);
                     if (attachmentDao.deleteAttachment(attachment) == 2) {
                         map.put("Code", 204);
                         map.put("Description", "Attachment Successfully Deleted");
 
 
-//                        MultipartFile file = req.getHeader("file");
-                        File destFile = new File(storagePath+attachment.getId());
+                       if(run.equalsIgnoreCase("dev")){
+                        File destFile = new File(attachment.getUrl());
                         if(destFile.exists()){
                             destFile.delete();
                         }
+                       }else if(run.equalsIgnoreCase("aws")){
+                           amazonClient.deleteFileFromS3Bucket(at.getUrl());
+                       }
                         return map;
                     }
                     else{

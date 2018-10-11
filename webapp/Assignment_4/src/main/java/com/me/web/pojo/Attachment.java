@@ -21,6 +21,9 @@ public class Attachment {
     @JsonBackReference
     private Transaction transaction;
 
+    @Column(name="path")
+    private String url;
+
 //    @Column(name="file_path")
 //    private String filePath;
 //
@@ -51,4 +54,12 @@ public class Attachment {
 //        this.file = file;
 //    }
 
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
 }
