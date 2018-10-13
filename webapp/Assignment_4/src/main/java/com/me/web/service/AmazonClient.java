@@ -2,8 +2,10 @@ package com.me.web.service;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.auth.InstanceProfileCredentialsProvider;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
@@ -37,9 +39,11 @@ public class AmazonClient{
     @PostConstruct
     private void initializeAmazon() {
         AWSCredentials credentials = new BasicAWSCredentials(this.accessKey, this.secretKey);
-        System.out.println("Access Key: "+this.accessKey);
-        System.out.println("Secret Key: "+this.secretKey);
         this.s3client = new AmazonS3Client(credentials);
+//        this.s3client = AmazonS3ClientBuilder.standard()
+//                .withCredentials(new InstanceProfileCredentialsProvider(false))
+//                .withRegion("us-east-1")
+//                .build();
     }
 
     private File convertMultiPartToFile(MultipartFile file) throws IOException {
@@ -55,7 +59,7 @@ public class AmazonClient{
 //    }
 
     private void uploadFileTos3bucket(String fileName, File file) {
-        s3client.putObject(new PutObjectRequest(bucketName, fileName, file)
+        this.s3client.putObject(new PutObjectRequest(this.bucketName, fileName, file)
                 .withCannedAcl(CannedAccessControlList.PublicRead));
     }
 
