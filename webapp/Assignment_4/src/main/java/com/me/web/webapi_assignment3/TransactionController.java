@@ -306,7 +306,6 @@ public class TransactionController {
                     tx.setDate(date);
                     tx.setCategory(category);
                     tx.setUser(user);
-
                     if (txDao.editTransaction(tx) == 2) {
                         map.put("Code", 201);
                         map.put("Description", "Created");
@@ -316,6 +315,69 @@ public class TransactionController {
                         map.put("Code", 400);
                         map.put("Description", "Bad Request");
                         return map;
+                    }
+                }
+                else{
+                    map.put("Code", 401);
+                    map.put("Description", "Unauthorized");
+                    return map;
+                }
+            }
+        }
+        map.put("Code",401);
+        map.put("Description","Unauthorized");
+        return map;
+    }
+
+    @RequestMapping(value="transaction/{id}/attachments/{aid}", method = RequestMethod.PUT)
+    public HashMap<String, Object> updateAttachmentTransaction(@PathVariable("id") int id,@PathVariable("aid") int aid, HttpServletRequest req, TransactionDao txDao, UserDao userDao, AttachmentDao attachmentDao,@RequestPart("file")MultipartFile file) throws  Exception{
+        String headers = req.getHeader(HttpHeaders.AUTHORIZATION);
+        User user = null;
+        HashMap<String, Object> map = new HashMap<>();
+        if(headers != null) {
+            String base64Credentials = headers.substring("Basic".length()).trim();
+            byte[] credDecoded = Base64.getDecoder().decode(base64Credentials);
+            String credentials = new String(credDecoded, StandardCharsets.UTF_8);
+            final String[] values = credentials.split(":", 2);
+            user = userDao.verifyUser(values[0], values[1]);
+            if (user == null || user.getUsername().isEmpty()) {
+                map.put("Code",401);
+                map.put("Description","Unauthorized");
+                return map;
+            }else{
+                int txId = id;
+                if(txDao.authorizeUser(txId,user) == 2) {
+                    Transaction tx = txDao.getTransactionById(txId);
+                    if (tx == null) {
+                        map.put("Code", 400);
+                        map.put("Description", "Bad Request");
+                        return map;
+                    }
+                    Attachment attachment = attachmentDao.getAttachmentById(aid);
+
+                    if(attachment != null) {
+                        //tx.addAttachment(attachment);
+                        if(run.equalsIgnoreCase("dev")){
+                            File destFile = new File(storagePath+attachment.getId());
+                            if(file!=null && !file.isEmpty()){
+                                if(destFile.exists()){
+                                    destFile.delete();
+                                }
+                                file.transferTo(destFile);
+                                attachment.setUrl(storagePath+attachment.getId());
+                                //attachmentDao.editAttachments(attachment);
+                            }}
+                        else if(run.equalsIgnoreCase("aws")){
+                            amazonClient.deleteFileFromS3Bucket(attachment.getUrl());
+                            String fileUrl = this.amazonClient.uploadFile(file, String.valueOf(attachment.getId()));
+                            attachment.setUrl(fileUrl);
+                            //attachmentDao.editAttachments(attachment);
+                        }
+
+                            map.put("Code", 200);
+                            map.put("Description", "File updated");
+
+                            return map;
                     }
                 }
                 else{
@@ -388,13 +450,13 @@ public class TransactionController {
                 if(txDao.authorizeUser(txId,user) == 2) {
                     List<Attachment> list = attachmentDao.getAllAttachments(id);
                     if (list.isEmpty()) {
-                        map.put("Code", 200);
+                        map.put("Code", 500);
                         map.put("Description", "No attachment found");
 
                         return map;
                     }
                     else{
-                        map.put("Code", 500);
+                        map.put("Code", 200);
                         map.put("Description", "OK");
                         map.put("Attachment", list);
                         return map;
