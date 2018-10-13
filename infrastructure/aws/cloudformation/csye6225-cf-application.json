@@ -99,7 +99,7 @@
              "Properties": {
                  "ImageId" : { "Fn::FindInMap" : [ "AWSRegionArch2AMI", { "Ref" : "AWS::Region" }, "HVM64"] },
                  "InstanceType"   : { "Ref" : "InstanceType" },
-                 "SecurityGroupIds" : [ {"Ref" : "InstanceSecurityGroup"} ],
+                 "SecurityGroupIds" : [ {"Ref" : "InstanceSecurityGroup"},{"Ref":"DBSecurityGroup"} ],
                  "SubnetId": {"Ref": "Subnet"},
                  "KeyName" : { "Ref" : "KeyName" },
                  "BlockDeviceMappings" : [
@@ -107,7 +107,7 @@
                    "DeviceName" : "/dev/sdm",
                    "Ebs" : {
                       "VolumeType" : "gp2",                     
-                      "DeleteOnTermination" : "false",
+                      "DeleteOnTermination" : "true",
                       "VolumeSize" : "20"
                    }
                  },
@@ -115,7 +115,8 @@
                    "DeviceName" : "/dev/sdk",
                    "NoDevice" : {}
                  }
-                 ]
+                 ]                            
+                 
              }       
          },
          "InstanceSecurityGroup" : {
@@ -157,7 +158,7 @@
                      "IpProtocol" : "tcp", 
                      "FromPort": 3306,
                      "ToPort" : 3306,
-                     "CidrIp" : "0.0.0.0/0"
+                     "SourceSecurityGroupId" : { "Ref" : "InstanceSecurityGroup" }
                  }
                  ]
                  
@@ -224,7 +225,7 @@
          "S3Bucket" : {
          "Type" : "AWS::S3::Bucket",
             "Properties" : {
-                "BucketName": "csye6225-fall2018-shahdhw.me.csye6225.com" 
+                "BucketName": "csye6225-fall2018-sathesu.me.csye6225.com" 
             } 
 
             },
