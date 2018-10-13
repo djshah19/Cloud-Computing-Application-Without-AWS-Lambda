@@ -30,20 +30,12 @@ public class AmazonClient{
     @Value("${bucketName}")
     private String bucketName;
 
-    @Value("${accessKey}")
-    private String accessKey;
-
-    @Value("${secretKey}")
-    private String secretKey;
 
     @PostConstruct
     private void initializeAmazon() {
-        AWSCredentials credentials = new BasicAWSCredentials(this.accessKey, this.secretKey);
-        this.s3client = new AmazonS3Client(credentials);
-//        this.s3client = AmazonS3ClientBuilder.standard()
-//                .withCredentials(new InstanceProfileCredentialsProvider(false))
-//                .withRegion("us-east-1")
-//                .build();
+        /*AWSCredentials credentials = new BasicAWSCredentials(this.accessKey, this.secretKey);
+        this.s3client = new AmazonS3Client(credentials);*/
+        this.s3client = AmazonS3ClientBuilder.standard().build();
     }
 
     private File convertMultiPartToFile(MultipartFile file) throws IOException {
@@ -69,8 +61,8 @@ public class AmazonClient{
         try {
             File file = convertMultiPartToFile(multipartFile);
             String fileName = id;//generateFileName(multipartFile);
-            fileUrl = this.endpointUrl + "/" + this.bucketName + "/" + fileName;
             uploadFileTos3bucket(fileName, file);
+            fileUrl = this.s3client.getUrl(this.bucketName,fileName).toString();
             file.delete();
         } catch (Exception e) {
             e.printStackTrace();
