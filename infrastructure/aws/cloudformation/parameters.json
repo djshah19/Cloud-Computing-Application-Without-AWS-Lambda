@@ -1,6 +1,7 @@
 [
 {
   "ParameterKey": "VPC",
+
   "ParameterValue": "vpc-0d8a40ba2c1667e54"
 },
 {
@@ -10,5 +11,6 @@
 {
   "ParameterKey": "Subnet1",
   "ParameterValue": "subnet-04ef2379d5da1cdc3"
+
 }
 ]
