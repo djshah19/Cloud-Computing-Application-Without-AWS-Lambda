@@ -87,21 +87,30 @@
                               { "Ref" : "Subnet1"}  ]
              }
          }, 
-         "myVPCSecurityGroup" : {
-              "Type" : "AWS::EC2::SecurityGroup",
-              "Properties" : {
-              "GroupDescription" : "Security group for RDS DB Instance.",
-              "VpcId" :  { "Ref" : "VPC" }
-              }
-         },
+
          "WebServerInstance": {
              "Type": "AWS::EC2::Instance",
              "Properties": {
                  "ImageId" : { "Fn::FindInMap" : [ "AWSRegionArch2AMI", { "Ref" : "AWS::Region" }, "HVM64"] },
                  "InstanceType"   : { "Ref" : "InstanceType" },
-                 "SecurityGroupIds" : [ {"Ref" : "InstanceSecurityGroup"},{"Ref":"DBSecurityGroup"} ],
+                 "SecurityGroupIds" : [ {
+            "Fn::GetAtt": [
+              "InstanceSecurityGroup",
+              "GroupId"
+            ]
+} ],
                  "SubnetId": {"Ref": "Subnet"},
                  "KeyName" : { "Ref" : "KeyName" },
+                 "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+[ 
+                "#!/bin/bash -xe \n",
+                "sudo yum install -y wget \n",
+                "sudo yum install -y java-1.8.0 \n",
+                "update-alternatives --config java \n"
+]]}},
                  "BlockDeviceMappings" : [
                  {
                    "DeviceName" : "/dev/sdm",
@@ -118,13 +127,14 @@
                  ]                            
                  
              }       
-         },
+},
+
+
          "InstanceSecurityGroup" : {
              "Type" : "AWS::EC2::SecurityGroup",
              "Properties" : {
                  "GroupName" : "csye6225-webapp",
                  "GroupDescription" : "csye6225 webapp security",
-                
                  "VpcId" : {"Ref" : "VPC"},    
                  "SecurityGroupIngress" : [{
                      "IpProtocol" : "tcp", 
@@ -143,28 +153,33 @@
                      "FromPort": 443,
                      "ToPort" : 443,
                      "CidrIp" : "0.0.0.0/0"
-                 }]
-                 
-             }
-         }, 
-         "DBSecurityGroup" : {   
-             "Type" : "AWS::EC2::SecurityGroup",
-             "Properties" : {
-                 "GroupName" : "csye6225-rds",
-                 "GroupDescription" : "csye6225 RDS DB security",
-                
-                 "VpcId" : {"Ref" : "VPC"},    
-                 "SecurityGroupIngress" : [{
+                 },
+                 {
                      "IpProtocol" : "tcp", 
                      "FromPort": 3306,
                      "ToPort" : 3306,
-                     "SourceSecurityGroupId" : { "Ref" : "InstanceSecurityGroup" }
+                     "CidrIp" : "0.0.0.0/0"
                  }
                  ]
                  
              }
-         },
-         
+         }, 
+"DBSecurityGroup": {
+   "Type": "AWS::RDS::DBSecurityGroup",
+   "Properties": {
+      "EC2VpcId" : { "Ref" : "VPC" },
+      "DBSecurityGroupIngress": [
+         {"EC2SecurityGroupId": {
+              "Fn::GetAtt": [
+                "InstanceSecurityGroup",
+                "GroupId"
+              ]
+}
+          }
+      ],
+      "GroupDescription": "DB SecurityGroup"
+   }
+},     
          "DynamoDBTable" : {
              "Type" : "AWS::DynamoDB::Table",
              "Properties" : {
@@ -174,58 +189,19 @@
                  "KeySchema" : [ {"AttributeName" : "id",
                                   "KeyType" : "HASH"} ],
                  
-                 
                  "ProvisionedThroughput" : {"ReadCapacityUnits": "5",
                                             "WriteCapacityUnits" : "5"},
                  
+                 "TimeToLiveSpecification": {"AttributeName": "TTL",
+                                             "Enabled": "TRUE"},
                  
                  "TableName" : "csye6225"
-                 
-                 
-             }
-         },
-         
-         "AppServerRootRole": {
-             "Type": "AWS::IAM::Role",
-             "Properties": {
-                 "AssumeRolePolicyDocument": {
-                     "Statement": [ {
-                         "Effect": "Allow",
-                         "Principal": {
-                             "Service": [ "ec2.amazonaws.com" ]
-                         },
-                         "Action": [ "sts:AssumeRole" ]
-                     } ]
-                 },
-                 "Path": "/"
-             }
-         },
-         "AppServerRolePolicies": {
-             "Type": "AWS::IAM::Policy",
-             "Properties": {
-                 "PolicyName": "AppServerS3Perms",
-                 "PolicyDocument": {
-                     "Statement": [ {
-                         "Effect": "Allow",
-                         "Action": "s3:*",
-                         "Resource": { "Fn::Join" : ["", [ "arn:aws:s3:::", { "Ref" : "S3Bucket" } , "/*" ]
-                         ] }
-                     } ]
-                 },
-                 "Roles": [ { "Ref": "AppServerRootRole" } ]
-             }
-         },
-         "AppServerInstanceProfile": {
-             "Type": "AWS::IAM::InstanceProfile",
-             "Properties": {
-                 "Path": "/",
-                 "Roles": [ { "Ref": "AppServerRootRole" } ]
              }
          },
          "S3Bucket" : {
          "Type" : "AWS::S3::Bucket",
             "Properties" : {
-                "BucketName": "csye6225-fall2018-sathesu.me.csye6225.com" 
+                "BucketName": "csye6225-fall2018-shahdhw.me.csye6225.com" 
             } 
 
             },
@@ -236,16 +212,13 @@
                 "DBName" : { "Ref" : "DBName"},
                 "AllocatedStorage" : { "Ref" : "DBAllocatedStorage"},
                 "DBInstanceClass" : { "Ref" : "DBClass"},
-                "Engine" : "mysql",
-                "EngineVersion" : "5.5",
+                "Engine" : "MySQL",
+                "EngineVersion" : "5.6.35",
                 "MasterUsername" : { "Ref" : "DBUsername"},
                 "MasterUserPassword" : { "Ref" : "DBPassword"},
                 "DBSubnetGroupName" : {"Ref" : "MyDBSubnetGroup"},
-                "VPCSecurityGroups" : [ {"Ref": "myVPCSecurityGroup"}, { "Ref" : "DBSecurityGroup"}],
-    
-                
-                "DBInstanceIdentifier" : "csye6225-spring2018",
-               
+                "DBSecurityGroups" : [ { "Ref" : "DBSecurityGroup"}],                
+                "DBInstanceIdentifier" : "csye6225-fall2018",
                 "MultiAZ" : false,
                 "PubliclyAccessible" : false            
             }
