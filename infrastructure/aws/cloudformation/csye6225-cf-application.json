@@ -118,6 +118,9 @@
                                 "#!/bin/bash -xe ",
                                 "sudo bash",
                                 "yum install ruby ntp wget java-1.8.0-openjdk-devel -y",
+                                "wget https://aws-codedeploy-us-east-1.s3.amazonaws.com/latest/install",
+                                "chmod +x ./install",
+                                "./install auto",
                                 "systemctl start ntpd ",
                                 "systemctl enable ntpd",
                                 "groupadd tomcat",
@@ -157,7 +160,8 @@
                                 "#systemctl start cloudwatch.service",
                                 "#systemctl enable cloudwatch.service",
                                 "systemctl enable tomcat.service",
-                                "systemctl start tomcat.service"
+                                "systemctl start tomcat.service",
+                                "service codedeploy-agent start"
                             ]
 ]}},
                  "BlockDeviceMappings" : [
