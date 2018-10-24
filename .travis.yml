@@ -8,7 +8,7 @@ install: true
 
 script:
   - pwd
-  - cd webapp
+  - cd webapp/Assignment_4
   - ./mvnw war
   - cd build/libs
   - ls -al
