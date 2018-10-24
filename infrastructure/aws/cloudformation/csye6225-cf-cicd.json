@@ -56,7 +56,7 @@
           ]
         },
         "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/AWSCodeDeployRole"
+          "arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole"
         ]
       }
     },
