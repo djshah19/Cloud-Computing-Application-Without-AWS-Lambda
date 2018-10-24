@@ -1,12 +1,15 @@
 {
-   "AWSTemplateFormatVersion": "2010-09-09",
-   "Parameters" : {
-   	"S3Bucket":{
-   		"Default": "csye6225-fall2018-shahdhw.me.csye6225.com",
-   		"Type": "String"
-   	}
-   },
    "Resources": {
+      "S3Bucket" : {
+         "Type" : "AWS::S3::Bucket",
+            "Properties" : {
+
+                "BucketName": "code-deploy.csye6225.com" 
+
+            } 
+
+            },
+
       "CodeDeployEC2ServiceRole": {
          "Type": "AWS::IAM::Role",
          "Properties": {
