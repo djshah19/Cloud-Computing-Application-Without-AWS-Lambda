@@ -78,7 +78,16 @@
          }          
      },
  
-    "Resources" : { 
+    "Resources" : {
+                "myInstanceProfile": {
+            "Type": "AWS::IAM::InstanceProfile",
+            "Properties": {
+                "Roles": [{
+                    "Fn::ImportValue": "ec2iamrole"
+                }],
+                "InstanceProfileName": "myProfile"
+            }
+},
          "MyDBSubnetGroup" : {
               "Type" : "AWS::RDS::DBSubnetGroup",
               "Properties" : {
@@ -164,7 +173,10 @@
                    "DeviceName" : "/dev/sdk",
                    "NoDevice" : {}
                  }
-                 ],   
+                 ],  
+                "IamInstanceProfile": {
+                    "Ref": "myInstanceProfile"
+},
                "Tags" : [
                 { "Key" : "EC2", "Value" : "EC2" } ]
              }       

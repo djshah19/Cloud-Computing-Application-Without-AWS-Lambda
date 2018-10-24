@@ -4,7 +4,7 @@
          "Type" : "AWS::S3::Bucket",
             "Properties" : {
 
-                "BucketName": "code-deploy.csye6225.com" 
+                "BucketName": "code-deploy-shahdhw.me.csye6225.com" 
 
             } 
 
@@ -13,7 +13,7 @@
       "CodeDeployEC2ServiceRole": {
          "Type": "AWS::IAM::Role",
          "Properties": {
-         	"RoleName" : "CodeDeployEC2ServiceRole",
+          "RoleName" : "CodeDeployEC2ServiceRole",
             "AssumeRolePolicyDocument": {
                "Version" : "2012-10-17",
                "Statement": [ {
@@ -41,7 +41,7 @@
       "CodeDeployServiceRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
-      	"RoleName" : "CodeDeployServiceRole",
+        "RoleName" : "CodeDeployServiceRole",
         "AssumeRolePolicyDocument": {
           "Version": "2012-10-17",
           "Statement": [
@@ -66,8 +66,8 @@
       "TravisUploadToS3": {
          "Type": "AWS::IAM::ManagedPolicy",
          "Properties": {
-         	"ManagedPolicyName" : "Travis-Upload-To-S3",
-         	"Description" : "Upload to S3",
+          "ManagedPolicyName" : "Travis-Upload-To-S3",
+          "Description" : "Upload to S3",
             "PolicyDocument": {
                "Version" : "2012-10-17",
                "Statement": [ {
@@ -81,8 +81,8 @@
     "TravisCodeDeploy": {
          "Type": "AWS::IAM::ManagedPolicy",
          "Properties": {
-         	"ManagedPolicyName" : "Travis-Code-Deploy",
-         	"Description" : "CodeDeploy to deploy to EC2",
+          "ManagedPolicyName" : "Travis-Code-Deploy",
+          "Description" : "CodeDeploy to deploy to EC2",
             "PolicyDocument": {
   "Version": "2012-10-17",
   "Statement": [
@@ -119,9 +119,17 @@
     }
   ]
 }
-}}
+}},
+},
+  "Outputs": {
+    "EC2IAMRole": {
+      "Description": "S3 bucket arn",
+      "Value": {
+        "Ref": "CodeDeployEC2ServiceRole"
+      },
+      "Export": {
+        "Name": "ec2iamrole"
+      }
+}
    }
 }
-
- 
-      
