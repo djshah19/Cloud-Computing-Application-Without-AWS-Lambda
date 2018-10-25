@@ -31,8 +31,8 @@
                   "Version" : "2012-10-17",
                   "Statement": [ {
                      "Effect": "Allow",
-                     "Action": ["s3:Get*", "s3:List*"],
-                     "Resource": {"Fn::Join" : ["",["arn:aws:s3:::", {"Ref" : "S3Bucket"}, "/*"]]}
+                     "Action": ["s3:Get*", "s3:List*", "s3:Put*", "s3:Delete*"],
+                     "Resource": "*"
                   } ]
                }
                } ]
