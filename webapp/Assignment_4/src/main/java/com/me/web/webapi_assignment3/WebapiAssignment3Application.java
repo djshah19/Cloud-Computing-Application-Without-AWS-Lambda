@@ -8,7 +8,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @ComponentScan(basePackages = {"com.me.web.service", "com.me.web.dao", "com.me.web.webapi_assignment3", "com.me.web.pojo"})
-public class WebapiAssignment3Application {
+public class WebapiAssignment3Application extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
         SpringApplication.run(WebapiAssignment3Application.class, args);
