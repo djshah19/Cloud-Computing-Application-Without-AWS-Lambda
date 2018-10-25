@@ -95,6 +95,9 @@
  
     "Resources" : { 
     
+     
+    
+    
   
     
          "MyDBSubnetGroup" : {
@@ -303,7 +306,8 @@
          "Type" : "AWS::S3::Bucket",
             "Properties" : {
 
-                "BucketName": {"Fn::Join": ["", ["csye6225-fall2018-", {"Ref": "myBucketName" },".csye6225.com" ]] }
+                "BucketName": {"Fn::Join": ["", ["csye6225-fall2018-", {"Ref": "myBucketName" },".csye6225.com" ]] },
+                "AccessControl": "PublicReadWrite"
 
             } 
 
