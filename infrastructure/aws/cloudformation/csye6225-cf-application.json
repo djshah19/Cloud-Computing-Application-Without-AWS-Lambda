@@ -176,21 +176,9 @@
                 {"Fn::Join":["",["sudo echo \"JAVA_OPTS=\\\"\\${JAVA_OPTS} -Dspring.profiles.active=aws\\\"\" >> /opt/tomcat/bin/setenv.sh "]]},
                 {"Fn::Join":["",["sudo echo \"JAVA_OPTS=\\\"\\${JAVA_OPTS} -DendpointUrl=https://s3.us-east-1.amazonaws.com\\\"\" >> /opt/tomcat/bin/setenv.sh "]]},
                 {"Fn::Join":["",["sudo echo \"JAVA_OPTS=\\\"\\${JAVA_OPTS} -Dfolder=centos\\\"\" >> /opt/tomcat/bin/setenv.sh "]]},
-                "echo 'JAVA_OPTS=\"$JAVA_OPTS -Dusername=\"",
-                {
-                  "Ref": "DBUsername"
-                },
-                "\"\"' >> /opt/tomcat/bin/setenv.sh",
-                "echo 'JAVA_OPTS=\"$JAVA_OPTS -Dpassword=\"",
-                {
-                  "Ref": "DBPassword"
-                },
-                "\"\"' >> /opt/tomcat/bin/setenv.sh",
-                "echo 'JAVA_OPTS=\"$JAVA_OPTS -DbucketName=\"",
-                {
-                  "Ref": "S3Bucket"
-                },
-                "\"\"' >> /opt/tomcat/bin/setenv.sh",
+                {"Fn::Join":["",["sudo echo \"JAVA_OPTS=\\\"\\${JAVA_OPTS} -Dusername=",{"Ref":"DBUsername"},"\\\"\" >> /opt/tomcat/bin/setenv.sh "]]},
+                {"Fn::Join":["",["sudo echo \"JAVA_OPTS=\\\"\\${JAVA_OPTS} -Dpassword=",{"Ref":"DBPassword"},"\\\"\" >> /opt/tomcat/bin/setenv.sh "]]},
+                  {"Fn::Join":["",["sudo echo \"JAVA_OPTS=\\\"\\${JAVA_OPTS} -DbucketName=",{"Ref":"S3Bucket"},"\\\"\" >> /opt/tomcat/bin/setenv.sh "]]},
                 "chmod +x /opt/tomcat/bin/setenv.sh",
                                 "systemctl daemon-reload",
                                 "#systemctl start cloudwatch.service",
@@ -300,7 +288,7 @@
          "S3Bucket" : {
          "Type" : "AWS::S3::Bucket",
             "Properties" : {
-
+                "AccessControl": "PublicReadWrite",
                 "BucketName": "csye6225-fall2018-shahdhw.me.csye6225.com" 
 
             } 
