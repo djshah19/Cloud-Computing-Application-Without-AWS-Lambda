@@ -55,7 +55,7 @@
 
       "DestinationCidrBlock" : {
          "Type" : "String",
-         "Default" : "0.0.0.0/24"
+         "Default" : "0.0.0.0/0"
       }
 
    },
@@ -86,13 +86,13 @@
             "CidrBlock" : { "Ref" : "VPCPuSubnetCidrBlock1" },
             "AvailabilityZone" : { "Ref" : "AvailabilityZone1" },
             
-            
+            "MapPublicIpOnLaunch" : true,
          
          
          "Tags" : [
             { "Key" : "Application", "Value" : { "Ref" : "AWS::StackName" } },
             { "Key" : "Network", "Value" : "Public" },
-            { "Key" : "Name", "Value" : "Public Subnet 1" }
+            { "Key" : "Name", "Value" : "Public-Subnet-1" }
             ]
             
             }
@@ -104,10 +104,11 @@
             "VpcId" : { "Ref" : "myVPC" },
             "CidrBlock" : { "Ref" : "VPCPuSubnetCidrBlock2" },
             "AvailabilityZone" : { "Ref" : "AvailabilityZone2" },
+            "MapPublicIpOnLaunch" : true,
             "Tags" : [
             { "Key" : "Application", "Value" : { "Ref" : "AWS::StackName" } },
             { "Key" : "Network", "Value" : "Public" },
-            { "Key" : "Name", "Value" : "Public Subnet 2" }
+            { "Key" : "Name", "Value" : "Public-Subnet-2" }
             ]
          }
          
@@ -120,10 +121,11 @@
             "VpcId" : { "Ref" : "myVPC" },
             "CidrBlock" : { "Ref" : "VPCPuSubnetCidrBlock3" },
             "AvailabilityZone" : { "Ref" : "AvailabilityZone3" },
+            "MapPublicIpOnLaunch" : true,
             "Tags" : [
             { "Key" : "Application", "Value" : { "Ref" : "AWS::StackName" } },
             { "Key" : "Network", "Value" : "Public" },
-            { "Key" : "Name", "Value" : "Public Subnet 3" }
+            { "Key" : "Name", "Value" : "Public-Subnet-3" }
             ]
          }
          
@@ -138,7 +140,7 @@
             "Tags" : [
             { "Key" : "Application", "Value" : { "Ref" : "AWS::StackName" } },
             { "Key" : "Network", "Value" : "Private" },
-            { "Key" : "Name", "Value" : "Private Subnet 1" }
+            { "Key" : "Name", "Value" : "Private-Subnet-1" }
             ]
          }
          
@@ -154,7 +156,7 @@
              "Tags" : [
           { "Key" : "Application", "Value" : { "Ref" : "AWS::StackName" } },
           { "Key" : "Network", "Value" : "Private" },
-	  { "Key" : "Name", "Value" : "Private Subnet 2" }
+	  { "Key" : "Name", "Value" : "Private-Subnet-2" }
 ]
          }
         
@@ -171,7 +173,7 @@
             "Tags" : [
           { "Key" : "Application", "Value" : { "Ref" : "AWS::StackName" } },
           { "Key" : "Network", "Value" : "Private" },
-	  { "Key" : "Name", "Value" : "Private Subnet 3" }
+	  { "Key" : "Name", "Value" : "Private-Subnet-3" }
 ]
          }
          
