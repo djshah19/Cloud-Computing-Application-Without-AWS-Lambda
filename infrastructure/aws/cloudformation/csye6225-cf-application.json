@@ -95,11 +95,6 @@
  
     "Resources" : { 
     
-     
-    
-    
-  
-    
          "MyDBSubnetGroup" : {
               "Type" : "AWS::RDS::DBSubnetGroup",
               "Properties" : {
@@ -306,12 +301,28 @@
          "Type" : "AWS::S3::Bucket",
             "Properties" : {
 
-                "BucketName": {"Fn::Join": ["", ["csye6225-fall2018-", {"Ref": "myBucketName" },".csye6225.com" ]] },
-                "AccessControl": "PublicReadWrite"
+                "BucketName": {"Fn::Join": ["", ["csye6225-fall2018-", {"Ref": "myBucketName" },".csye6225.com" ]] }
 
             } 
 
             },
+
+                "S3BucketPolicy" : {
+        "Type" : "AWS::S3::BucketPolicy",
+     "Properties" :   {
+        "Bucket" : {"Ref" : "S3Bucket"},
+        "PolicyDocument" : {
+            "Version" : "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "AddPerm",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "s3:*",
+            "Resource": {"Fn::Join" : ["",["arn:aws:s3:::", {"Ref" : "S3Bucket"}, "/*"]]}
+        }
+    ]
+}}},
          "RDSInstance": {
             "Type" : "AWS::RDS::DBInstance",
             "Properties" :
