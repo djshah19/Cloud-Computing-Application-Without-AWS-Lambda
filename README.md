@@ -2,8 +2,8 @@
 # README FILE
 
 A.) Team Members Information:
-1. Ashwath Shunti Mahabalagiri - shuntimahabalagiri.a@husky.neu.edu
-2. Dhwani Shah - shah.dhw@husky.neu.edu
+1. Dhwani Shah - shah.dhw@husky.neu.edu
+2. Ashwath Shunti Mahabalagiri - shuntimahabalagiri.a@husky.neu.edu
 3. Suyog Sathe - sathe.su@husky.neu.edu
 4. Ivan Fernando - fernando.i@husky.neu.edu
 
